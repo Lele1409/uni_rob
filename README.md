@@ -14,6 +14,5 @@ git submodule update --init --recursive
 
 ## Structure
 
-In `./wX` sind die Lösungen für die einzelnen Wochen.
-In `./ros2_ws` ist der Workspace für ros2.
- 
+- In `./wX` sind die Lösungen für die einzelnen Wochen.
+- In `./ros2_ws` ist der Workspace für ros2.
