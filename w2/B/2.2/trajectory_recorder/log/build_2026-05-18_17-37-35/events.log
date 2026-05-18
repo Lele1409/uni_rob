@@ -1,0 +1,134 @@
+[0.000000] (-) TimerEvent: {}
+[0.000179] (trajectory_recorder) JobQueued: {'identifier': 'trajectory_recorder', 'dependencies': OrderedDict()}
+[0.000727] (trajectory_recorder) JobStarted: {'identifier': 'trajectory_recorder'}
+[0.014774] (trajectory_recorder) JobProgress: {'identifier': 'trajectory_recorder', 'progress': 'cmake'}
+[0.015184] (trajectory_recorder) Command: {'cmd': ['/usr/bin/cmake', '/home/lele/uni_rob/w2/B/2.2/trajectory_recorder', '-DCMAKE_INSTALL_PREFIX=/home/lele/uni_rob/w2/B/2.2/trajectory_recorder/install/trajectory_recorder'], 'cwd': '/home/lele/uni_rob/w2/B/2.2/trajectory_recorder/build/trajectory_recorder', 'env': OrderedDict({'LESSOPEN': '| /usr/bin/lesspipe %s', 'USER': 'lele', 'XDG_SESSION_TYPE': 'wayland', 'CLUTTER_DISABLE_MIPMAPPED_TEXT': '1', 'SHLVL': '1', 'LD_LIBRARY_PATH': '/opt/ros/jazzy/opt/rviz_ogre_vendor/lib:/opt/ros/jazzy/lib/aarch64-linux-gnu:/opt/ros/jazzy/opt/gz_math_vendor/lib:/opt/ros/jazzy/opt/gz_utils_vendor/lib:/opt/ros/jazzy/opt/gz_cmake_vendor/lib:/opt/ros/jazzy/lib', 'HOME': '/home/lele', 'OLDPWD': '/home/lele/uni_rob/w2/B/2.2/trajectory_recorder/src', 'DESKTOP_SESSION': 'ubuntu', 'ROS_PYTHON_VERSION': '3', 'GNOME_SHELL_SESSION_MODE': 'ubuntu', 'GTK_MODULES': 'gail:atk-bridge', 'SYSTEMD_EXEC_PID': '1933', 'GSM_SKIP_SSH_AGENT_WORKAROUND': 'true', 'DBUS_SESSION_BUS_ADDRESS': 'unix:path=/run/user/1000/bus', 'COLORTERM': 'truecolor', 'DEBUGINFOD_URLS': 'https://debuginfod.ubuntu.com', 'IM_CONFIG_PHASE': '1', 'WAYLAND_DISPLAY': 'wayland-0', 'ROS_DISTRO': 'jazzy', 'LOGNAME': 'lele', '_': '/usr/bin/colcon', 'ROS_VERSION': '2', 'MEMORY_PRESSURE_WATCH': '/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/session.slice/org.gnome.Shell@wayland.service/memory.pressure', 'XDG_SESSION_CLASS': 'user', 'USERNAME': 'lele', 'TERM': 'xterm-256color', 'GNOME_DESKTOP_SESSION_ID': 'this-is-deprecated', 'PATH': '/opt/ros/jazzy/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin:/snap/bin', 'SESSION_MANAGER': 'local/lele-mac-ubuntu:@/tmp/.ICE-unix/1886,unix/lele-mac-ubuntu:/tmp/.ICE-unix/1886', 'XDG_MENU_PREFIX': 'gnome-', 'GNOME_TERMINAL_SCREEN': '/org/gnome/Terminal/screen/59e11588_9bda_4fcc_94f1_f334249c8b62', 'GNOME_SETUP_DISPLAY': ':1', 'XDG_RUNTIME_DIR': '/run/user/1000', 'DISPLAY': ':0', 'LANG': 'en_US.UTF-8', 'XDG_CURRENT_DESKTOP': 'ubuntu:GNOME', 'XMODIFIERS': '@im=ibus', 'XDG_SESSION_DESKTOP': 'ubuntu', 'XAUTHORITY': '/run/user/1000/.mutter-Xwaylandauth.WT5FP3', 'LS_COLORS': 'rs=0:di=01;34:ln=01;36:mh=00:pi=40;33:so=01;35:do=01;35:bd=40;33;01:cd=40;33;01:or=40;31;01:mi=00:su=37;41:sg=30;43:ca=00:tw=30;42:ow=34;42:st=37;44:ex=01;32:*.tar=01;31:*.tgz=01;31:*.arc=01;31:*.arj=01;31:*.taz=01;31:*.lha=01;31:*.lz4=01;31:*.lzh=01;31:*.lzma=01;31:*.tlz=01;31:*.txz=01;31:*.tzo=01;31:*.t7z=01;31:*.zip=01;31:*.z=01;31:*.dz=01;31:*.gz=01;31:*.lrz=01;31:*.lz=01;31:*.lzo=01;31:*.xz=01;31:*.zst=01;31:*.tzst=01;31:*.bz2=01;31:*.bz=01;31:*.tbz=01;31:*.tbz2=01;31:*.tz=01;31:*.deb=01;31:*.rpm=01;31:*.jar=01;31:*.war=01;31:*.ear=01;31:*.sar=01;31:*.rar=01;31:*.alz=01;31:*.ace=01;31:*.zoo=01;31:*.cpio=01;31:*.7z=01;31:*.rz=01;31:*.cab=01;31:*.wim=01;31:*.swm=01;31:*.dwm=01;31:*.esd=01;31:*.avif=01;35:*.jpg=01;35:*.jpeg=01;35:*.mjpg=01;35:*.mjpeg=01;35:*.gif=01;35:*.bmp=01;35:*.pbm=01;35:*.pgm=01;35:*.ppm=01;35:*.tga=01;35:*.xbm=01;35:*.xpm=01;35:*.tif=01;35:*.tiff=01;35:*.png=01;35:*.svg=01;35:*.svgz=01;35:*.mng=01;35:*.pcx=01;35:*.mov=01;35:*.mpg=01;35:*.mpeg=01;35:*.m2v=01;35:*.mkv=01;35:*.webm=01;35:*.webp=01;35:*.ogm=01;35:*.mp4=01;35:*.m4v=01;35:*.mp4v=01;35:*.vob=01;35:*.qt=01;35:*.nuv=01;35:*.wmv=01;35:*.asf=01;35:*.rm=01;35:*.rmvb=01;35:*.flc=01;35:*.avi=01;35:*.fli=01;35:*.flv=01;35:*.gl=01;35:*.dl=01;35:*.xcf=01;35:*.xwd=01;35:*.yuv=01;35:*.cgm=01;35:*.emf=01;35:*.ogv=01;35:*.ogx=01;35:*.aac=00;36:*.au=00;36:*.flac=00;36:*.m4a=00;36:*.mid=00;36:*.midi=00;36:*.mka=00;36:*.mp3=00;36:*.mpc=00;36:*.ogg=00;36:*.ra=00;36:*.wav=00;36:*.oga=00;36:*.opus=00;36:*.spx=00;36:*.xspf=00;36:*~=00;90:*#=00;90:*.bak=00;90:*.crdownload=00;90:*.dpkg-dist=00;90:*.dpkg-new=00;90:*.dpkg-old=00;90:*.dpkg-tmp=00;90:*.old=00;90:*.orig=00;90:*.part=00;90:*.rej=00;90:*.rpmnew=00;90:*.rpmorig=00;90:*.rpmsave=00;90:*.swp=00;90:*.tmp=00;90:*.ucf-dist=00;90:*.ucf-new=00;90:*.ucf-old=00;90:', 'GNOME_TERMINAL_SERVICE': ':1.141', 'SSH_AUTH_SOCK': '/run/user/1000/keyring/ssh', 'ROS_DOMAIN_ID': '149', 'AMENT_PREFIX_PATH': '/opt/ros/jazzy', 'SHELL': '/bin/bash', 'QT_ACCESSIBILITY': '1', 'GDMSESSION': 'ubuntu', 'LESSCLOSE': '/usr/bin/lesspipe %s %s', 'ROS_AUTOMATIC_DISCOVERY_RANGE': 'SUBNET', 'QT_IM_MODULE': 'ibus', 'PWD': '/home/lele/uni_rob/w2/B/2.2/trajectory_recorder/build/trajectory_recorder', 'XDG_CONFIG_DIRS': '/etc/xdg/xdg-ubuntu:/etc/xdg', 'XDG_DATA_DIRS': '/usr/share/ubuntu:/usr/share/gnome:/usr/local/share/:/usr/share/:/var/lib/snapd/desktop', 'PYTHONPATH': '/opt/ros/jazzy/lib/python3.12/site-packages', 'COLCON': '1', 'MEMORY_PRESSURE_WRITE': 'c29tZSAyMDAwMDAgMjAwMDAwMAA=', 'VTE_VERSION': '7600', 'CMAKE_PREFIX_PATH': '/opt/ros/jazzy/opt/gz_math_vendor:/opt/ros/jazzy/opt/gz_utils_vendor:/opt/ros/jazzy/opt/gz_cmake_vendor:/opt/ros/jazzy'}), 'shell': False}
+[0.100078] (-) TimerEvent: {}
+[0.204841] (-) TimerEvent: {}
+[0.309503] (-) TimerEvent: {}
+[0.411853] (-) TimerEvent: {}
+[0.498379] (trajectory_recorder) StdoutLine: {'line': b'-- The C compiler identification is GNU 13.3.0\n'}
+[0.511934] (-) TimerEvent: {}
+[0.612179] (-) TimerEvent: {}
+[0.712488] (-) TimerEvent: {}
+[0.733201] (trajectory_recorder) StdoutLine: {'line': b'-- The CXX compiler identification is GNU 13.3.0\n'}
+[0.749099] (trajectory_recorder) StdoutLine: {'line': b'-- Detecting C compiler ABI info\n'}
+[0.811398] (trajectory_recorder) StdoutLine: {'line': b'-- Detecting C compiler ABI info - done\n'}
+[0.812561] (-) TimerEvent: {}
+[0.819844] (trajectory_recorder) StdoutLine: {'line': b'-- Check for working C compiler: /usr/bin/cc - skipped\n'}
+[0.820329] (trajectory_recorder) StdoutLine: {'line': b'-- Detecting C compile features\n'}
+[0.820833] (trajectory_recorder) StdoutLine: {'line': b'-- Detecting C compile features - done\n'}
+[0.827083] (trajectory_recorder) StdoutLine: {'line': b'-- Detecting CXX compiler ABI info\n'}
+[0.886195] (trajectory_recorder) StdoutLine: {'line': b'-- Detecting CXX compiler ABI info - done\n'}
+[0.894500] (trajectory_recorder) StdoutLine: {'line': b'-- Check for working CXX compiler: /usr/bin/c++ - skipped\n'}
+[0.894868] (trajectory_recorder) StdoutLine: {'line': b'-- Detecting CXX compile features\n'}
+[0.895264] (trajectory_recorder) StdoutLine: {'line': b'-- Detecting CXX compile features - done\n'}
+[0.906190] (trajectory_recorder) StdoutLine: {'line': b'-- Found ament_cmake: 2.5.6 (/opt/ros/jazzy/share/ament_cmake/cmake)\n'}
+[0.912658] (-) TimerEvent: {}
+[1.004261] (trajectory_recorder) StdoutLine: {'line': b'-- Found Python3: /usr/bin/python3 (found version "3.12.3") found components: Interpreter \n'}
+[1.012749] (-) TimerEvent: {}
+[1.088978] (trajectory_recorder) StdoutLine: {'line': b'-- Found rclcpp: 28.1.18 (/opt/ros/jazzy/share/rclcpp/cmake)\n'}
+[1.112832] (-) TimerEvent: {}
+[1.134027] (trajectory_recorder) StdoutLine: {'line': b'-- Found rosidl_generator_c: 4.6.7 (/opt/ros/jazzy/share/rosidl_generator_c/cmake)\n'}
+[1.145792] (trajectory_recorder) StdoutLine: {'line': b'-- Found rosidl_generator_cpp: 4.6.7 (/opt/ros/jazzy/share/rosidl_generator_cpp/cmake)\n'}
+[1.166187] (trajectory_recorder) StdoutLine: {'line': b'-- Using all available rosidl_typesupport_c: rosidl_typesupport_fastrtps_c;rosidl_typesupport_introspection_c\n'}
+[1.183107] (trajectory_recorder) StdoutLine: {'line': b'-- Using all available rosidl_typesupport_cpp: rosidl_typesupport_fastrtps_cpp;rosidl_typesupport_introspection_cpp\n'}
+[1.212934] (-) TimerEvent: {}
+[1.258047] (trajectory_recorder) StdoutLine: {'line': b'-- Found rmw_implementation_cmake: 7.3.3 (/opt/ros/jazzy/share/rmw_implementation_cmake/cmake)\n'}
+[1.260656] (trajectory_recorder) StdoutLine: {'line': b'-- Found rmw_fastrtps_cpp: 8.4.3 (/opt/ros/jazzy/share/rmw_fastrtps_cpp/cmake)\n'}
+[1.313043] (-) TimerEvent: {}
+[1.337363] (trajectory_recorder) StdoutLine: {'line': b'-- Found OpenSSL: /usr/lib/aarch64-linux-gnu/libcrypto.so (found version "3.0.13")  \n'}
+[1.352270] (trajectory_recorder) StdoutLine: {'line': b'-- Found FastRTPS: /opt/ros/jazzy/include (Required is at least version "2.13") \n'}
+[1.369418] (trajectory_recorder) StdoutLine: {'line': b"-- Using RMW implementation 'rmw_fastrtps_cpp' as default\n"}
+[1.413130] (-) TimerEvent: {}
+[1.437189] (trajectory_recorder) StdoutLine: {'line': b'-- Found std_msgs: 5.3.7 (/opt/ros/jazzy/share/std_msgs/cmake)\n'}
+[1.449880] (trajectory_recorder) StdoutLine: {'line': b'-- Found nav_msgs: 5.3.7 (/opt/ros/jazzy/share/nav_msgs/cmake)\n'}
+[1.490828] (trajectory_recorder) StdoutLine: {'line': b'-- Found sensor_msgs: 5.3.7 (/opt/ros/jazzy/share/sensor_msgs/cmake)\n'}
+[1.515779] (-) TimerEvent: {}
+[1.515976] (trajectory_recorder) StdoutLine: {'line': b'-- Found ament_lint_auto: 0.17.5 (/opt/ros/jazzy/share/ament_lint_auto/cmake)\n'}
+[1.600252] (trajectory_recorder) StdoutLine: {'line': b"-- Added test 'cppcheck' to perform static code analysis on C / C++ code\n"}
+[1.600453] (trajectory_recorder) StdoutLine: {'line': b'-- Configured cppcheck include dirs: \n'}
+[1.600517] (trajectory_recorder) StdoutLine: {'line': b'-- Configured cppcheck exclude dirs and/or files: \n'}
+[1.601198] (trajectory_recorder) StdoutLine: {'line': b"-- Added test 'flake8' to check Python code syntax and style conventions\n"}
+[1.601244] (trajectory_recorder) StdoutLine: {'line': b"-- Configured 'flake8' exclude dirs and/or files: \n"}
+[1.602365] (trajectory_recorder) StdoutLine: {'line': b"-- Added test 'lint_cmake' to check CMake code style\n"}
+[1.603215] (trajectory_recorder) StdoutLine: {'line': b"-- Added test 'pep257' to check Python code against some of the docstring style conventions in PEP 257\n"}
+[1.606772] (trajectory_recorder) StdoutLine: {'line': b"-- Added test 'uncrustify' to check C / C++ code style\n"}
+[1.606815] (trajectory_recorder) StdoutLine: {'line': b'-- Configured uncrustify additional arguments: \n'}
+[1.607796] (trajectory_recorder) StdoutLine: {'line': b"-- Added test 'xmllint' to check XML markup files\n"}
+[1.609309] (trajectory_recorder) StdoutLine: {'line': b'-- Configuring done (1.5s)\n'}
+[1.617076] (trajectory_recorder) StdoutLine: {'line': b'-- Generating done (0.0s)\n'}
+[1.617131] (-) TimerEvent: {}
+[1.621618] (trajectory_recorder) StdoutLine: {'line': b'-- Build files have been written to: /home/lele/uni_rob/w2/B/2.2/trajectory_recorder/build/trajectory_recorder\n'}
+[1.628544] (trajectory_recorder) CommandEnded: {'returncode': 0}
+[1.628842] (trajectory_recorder) JobProgress: {'identifier': 'trajectory_recorder', 'progress': 'build'}
+[1.629376] (trajectory_recorder) Command: {'cmd': ['/usr/bin/cmake', '--build', '/home/lele/uni_rob/w2/B/2.2/trajectory_recorder/build/trajectory_recorder', '--', '-j4', '-l4'], 'cwd': '/home/lele/uni_rob/w2/B/2.2/trajectory_recorder/build/trajectory_recorder', 'env': OrderedDict({'LESSOPEN': '| /usr/bin/lesspipe %s', 'USER': 'lele', 'XDG_SESSION_TYPE': 'wayland', 'CLUTTER_DISABLE_MIPMAPPED_TEXT': '1', 'SHLVL': '1', 'LD_LIBRARY_PATH': '/opt/ros/jazzy/opt/rviz_ogre_vendor/lib:/opt/ros/jazzy/lib/aarch64-linux-gnu:/opt/ros/jazzy/opt/gz_math_vendor/lib:/opt/ros/jazzy/opt/gz_utils_vendor/lib:/opt/ros/jazzy/opt/gz_cmake_vendor/lib:/opt/ros/jazzy/lib', 'HOME': '/home/lele', 'OLDPWD': '/home/lele/uni_rob/w2/B/2.2/trajectory_recorder/src', 'DESKTOP_SESSION': 'ubuntu', 'ROS_PYTHON_VERSION': '3', 'GNOME_SHELL_SESSION_MODE': 'ubuntu', 'GTK_MODULES': 'gail:atk-bridge', 'SYSTEMD_EXEC_PID': '1933', 'GSM_SKIP_SSH_AGENT_WORKAROUND': 'true', 'DBUS_SESSION_BUS_ADDRESS': 'unix:path=/run/user/1000/bus', 'COLORTERM': 'truecolor', 'DEBUGINFOD_URLS': 'https://debuginfod.ubuntu.com', 'IM_CONFIG_PHASE': '1', 'WAYLAND_DISPLAY': 'wayland-0', 'ROS_DISTRO': 'jazzy', 'LOGNAME': 'lele', '_': '/usr/bin/colcon', 'ROS_VERSION': '2', 'MEMORY_PRESSURE_WATCH': '/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/session.slice/org.gnome.Shell@wayland.service/memory.pressure', 'XDG_SESSION_CLASS': 'user', 'USERNAME': 'lele', 'TERM': 'xterm-256color', 'GNOME_DESKTOP_SESSION_ID': 'this-is-deprecated', 'PATH': '/opt/ros/jazzy/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin:/snap/bin', 'SESSION_MANAGER': 'local/lele-mac-ubuntu:@/tmp/.ICE-unix/1886,unix/lele-mac-ubuntu:/tmp/.ICE-unix/1886', 'XDG_MENU_PREFIX': 'gnome-', 'GNOME_TERMINAL_SCREEN': '/org/gnome/Terminal/screen/59e11588_9bda_4fcc_94f1_f334249c8b62', 'GNOME_SETUP_DISPLAY': ':1', 'XDG_RUNTIME_DIR': '/run/user/1000', 'DISPLAY': ':0', 'LANG': 'en_US.UTF-8', 'XDG_CURRENT_DESKTOP': 'ubuntu:GNOME', 'XMODIFIERS': '@im=ibus', 'XDG_SESSION_DESKTOP': 'ubuntu', 'XAUTHORITY': '/run/user/1000/.mutter-Xwaylandauth.WT5FP3', 'LS_COLORS': 'rs=0:di=01;34:ln=01;36:mh=00:pi=40;33:so=01;35:do=01;35:bd=40;33;01:cd=40;33;01:or=40;31;01:mi=00:su=37;41:sg=30;43:ca=00:tw=30;42:ow=34;42:st=37;44:ex=01;32:*.tar=01;31:*.tgz=01;31:*.arc=01;31:*.arj=01;31:*.taz=01;31:*.lha=01;31:*.lz4=01;31:*.lzh=01;31:*.lzma=01;31:*.tlz=01;31:*.txz=01;31:*.tzo=01;31:*.t7z=01;31:*.zip=01;31:*.z=01;31:*.dz=01;31:*.gz=01;31:*.lrz=01;31:*.lz=01;31:*.lzo=01;31:*.xz=01;31:*.zst=01;31:*.tzst=01;31:*.bz2=01;31:*.bz=01;31:*.tbz=01;31:*.tbz2=01;31:*.tz=01;31:*.deb=01;31:*.rpm=01;31:*.jar=01;31:*.war=01;31:*.ear=01;31:*.sar=01;31:*.rar=01;31:*.alz=01;31:*.ace=01;31:*.zoo=01;31:*.cpio=01;31:*.7z=01;31:*.rz=01;31:*.cab=01;31:*.wim=01;31:*.swm=01;31:*.dwm=01;31:*.esd=01;31:*.avif=01;35:*.jpg=01;35:*.jpeg=01;35:*.mjpg=01;35:*.mjpeg=01;35:*.gif=01;35:*.bmp=01;35:*.pbm=01;35:*.pgm=01;35:*.ppm=01;35:*.tga=01;35:*.xbm=01;35:*.xpm=01;35:*.tif=01;35:*.tiff=01;35:*.png=01;35:*.svg=01;35:*.svgz=01;35:*.mng=01;35:*.pcx=01;35:*.mov=01;35:*.mpg=01;35:*.mpeg=01;35:*.m2v=01;35:*.mkv=01;35:*.webm=01;35:*.webp=01;35:*.ogm=01;35:*.mp4=01;35:*.m4v=01;35:*.mp4v=01;35:*.vob=01;35:*.qt=01;35:*.nuv=01;35:*.wmv=01;35:*.asf=01;35:*.rm=01;35:*.rmvb=01;35:*.flc=01;35:*.avi=01;35:*.fli=01;35:*.flv=01;35:*.gl=01;35:*.dl=01;35:*.xcf=01;35:*.xwd=01;35:*.yuv=01;35:*.cgm=01;35:*.emf=01;35:*.ogv=01;35:*.ogx=01;35:*.aac=00;36:*.au=00;36:*.flac=00;36:*.m4a=00;36:*.mid=00;36:*.midi=00;36:*.mka=00;36:*.mp3=00;36:*.mpc=00;36:*.ogg=00;36:*.ra=00;36:*.wav=00;36:*.oga=00;36:*.opus=00;36:*.spx=00;36:*.xspf=00;36:*~=00;90:*#=00;90:*.bak=00;90:*.crdownload=00;90:*.dpkg-dist=00;90:*.dpkg-new=00;90:*.dpkg-old=00;90:*.dpkg-tmp=00;90:*.old=00;90:*.orig=00;90:*.part=00;90:*.rej=00;90:*.rpmnew=00;90:*.rpmorig=00;90:*.rpmsave=00;90:*.swp=00;90:*.tmp=00;90:*.ucf-dist=00;90:*.ucf-new=00;90:*.ucf-old=00;90:', 'GNOME_TERMINAL_SERVICE': ':1.141', 'SSH_AUTH_SOCK': '/run/user/1000/keyring/ssh', 'ROS_DOMAIN_ID': '149', 'AMENT_PREFIX_PATH': '/opt/ros/jazzy', 'SHELL': '/bin/bash', 'QT_ACCESSIBILITY': '1', 'GDMSESSION': 'ubuntu', 'LESSCLOSE': '/usr/bin/lesspipe %s %s', 'ROS_AUTOMATIC_DISCOVERY_RANGE': 'SUBNET', 'QT_IM_MODULE': 'ibus', 'PWD': '/home/lele/uni_rob/w2/B/2.2/trajectory_recorder/build/trajectory_recorder', 'XDG_CONFIG_DIRS': '/etc/xdg/xdg-ubuntu:/etc/xdg', 'XDG_DATA_DIRS': '/usr/share/ubuntu:/usr/share/gnome:/usr/local/share/:/usr/share/:/var/lib/snapd/desktop', 'PYTHONPATH': '/opt/ros/jazzy/lib/python3.12/site-packages', 'COLCON': '1', 'MEMORY_PRESSURE_WRITE': 'c29tZSAyMDAwMDAgMjAwMDAwMAA=', 'VTE_VERSION': '7600', 'CMAKE_PREFIX_PATH': '/opt/ros/jazzy/opt/gz_math_vendor:/opt/ros/jazzy/opt/gz_utils_vendor:/opt/ros/jazzy/opt/gz_cmake_vendor:/opt/ros/jazzy'}), 'shell': False}
+[1.657559] (trajectory_recorder) StdoutLine: {'line': b'[ 50%] \x1b[32mBuilding CXX object CMakeFiles/recorder.dir/src/recorder.cpp.o\x1b[0m\n'}
+[1.717241] (-) TimerEvent: {}
+[1.817537] (-) TimerEvent: {}
+[1.919387] (-) TimerEvent: {}
+[2.023136] (-) TimerEvent: {}
+[2.123978] (-) TimerEvent: {}
+[2.224208] (-) TimerEvent: {}
+[2.329018] (-) TimerEvent: {}
+[2.433302] (-) TimerEvent: {}
+[2.538065] (-) TimerEvent: {}
+[2.641852] (-) TimerEvent: {}
+[2.746304] (-) TimerEvent: {}
+[2.851091] (-) TimerEvent: {}
+[2.951397] (-) TimerEvent: {}
+[3.052896] (-) TimerEvent: {}
+[3.156054] (-) TimerEvent: {}
+[3.257915] (-) TimerEvent: {}
+[3.358439] (-) TimerEvent: {}
+[3.459929] (-) TimerEvent: {}
+[3.561326] (-) TimerEvent: {}
+[3.661710] (-) TimerEvent: {}
+[3.765697] (-) TimerEvent: {}
+[3.869516] (-) TimerEvent: {}
+[3.971927] (-) TimerEvent: {}
+[4.076623] (-) TimerEvent: {}
+[4.177494] (-) TimerEvent: {}
+[4.282257] (-) TimerEvent: {}
+[4.387161] (-) TimerEvent: {}
+[4.491608] (-) TimerEvent: {}
+[4.594782] (-) TimerEvent: {}
+[4.698578] (-) TimerEvent: {}
+[4.800148] (-) TimerEvent: {}
+[4.903967] (-) TimerEvent: {}
+[5.007859] (-) TimerEvent: {}
+[5.108196] (-) TimerEvent: {}
+[5.212255] (-) TimerEvent: {}
+[5.312578] (-) TimerEvent: {}
+[5.414202] (-) TimerEvent: {}
+[5.514501] (-) TimerEvent: {}
+[5.615089] (-) TimerEvent: {}
+[5.715354] (-) TimerEvent: {}
+[5.765573] (trajectory_recorder) StdoutLine: {'line': b'[100%] \x1b[32m\x1b[1mLinking CXX executable recorder\x1b[0m\n'}
+[5.815489] (-) TimerEvent: {}
+[5.915733] (-) TimerEvent: {}
+[5.949198] (trajectory_recorder) StdoutLine: {'line': b'[100%] Built target recorder\n'}
+[5.959585] (trajectory_recorder) CommandEnded: {'returncode': 0}
+[5.961157] (trajectory_recorder) JobProgress: {'identifier': 'trajectory_recorder', 'progress': 'install'}
+[5.968210] (trajectory_recorder) Command: {'cmd': ['/usr/bin/cmake', '--install', '/home/lele/uni_rob/w2/B/2.2/trajectory_recorder/build/trajectory_recorder'], 'cwd': '/home/lele/uni_rob/w2/B/2.2/trajectory_recorder/build/trajectory_recorder', 'env': OrderedDict({'LESSOPEN': '| /usr/bin/lesspipe %s', 'USER': 'lele', 'XDG_SESSION_TYPE': 'wayland', 'CLUTTER_DISABLE_MIPMAPPED_TEXT': '1', 'SHLVL': '1', 'LD_LIBRARY_PATH': '/opt/ros/jazzy/opt/rviz_ogre_vendor/lib:/opt/ros/jazzy/lib/aarch64-linux-gnu:/opt/ros/jazzy/opt/gz_math_vendor/lib:/opt/ros/jazzy/opt/gz_utils_vendor/lib:/opt/ros/jazzy/opt/gz_cmake_vendor/lib:/opt/ros/jazzy/lib', 'HOME': '/home/lele', 'OLDPWD': '/home/lele/uni_rob/w2/B/2.2/trajectory_recorder/src', 'DESKTOP_SESSION': 'ubuntu', 'ROS_PYTHON_VERSION': '3', 'GNOME_SHELL_SESSION_MODE': 'ubuntu', 'GTK_MODULES': 'gail:atk-bridge', 'SYSTEMD_EXEC_PID': '1933', 'GSM_SKIP_SSH_AGENT_WORKAROUND': 'true', 'DBUS_SESSION_BUS_ADDRESS': 'unix:path=/run/user/1000/bus', 'COLORTERM': 'truecolor', 'DEBUGINFOD_URLS': 'https://debuginfod.ubuntu.com', 'IM_CONFIG_PHASE': '1', 'WAYLAND_DISPLAY': 'wayland-0', 'ROS_DISTRO': 'jazzy', 'LOGNAME': 'lele', '_': '/usr/bin/colcon', 'ROS_VERSION': '2', 'MEMORY_PRESSURE_WATCH': '/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/session.slice/org.gnome.Shell@wayland.service/memory.pressure', 'XDG_SESSION_CLASS': 'user', 'USERNAME': 'lele', 'TERM': 'xterm-256color', 'GNOME_DESKTOP_SESSION_ID': 'this-is-deprecated', 'PATH': '/opt/ros/jazzy/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin:/snap/bin', 'SESSION_MANAGER': 'local/lele-mac-ubuntu:@/tmp/.ICE-unix/1886,unix/lele-mac-ubuntu:/tmp/.ICE-unix/1886', 'XDG_MENU_PREFIX': 'gnome-', 'GNOME_TERMINAL_SCREEN': '/org/gnome/Terminal/screen/59e11588_9bda_4fcc_94f1_f334249c8b62', 'GNOME_SETUP_DISPLAY': ':1', 'XDG_RUNTIME_DIR': '/run/user/1000', 'DISPLAY': ':0', 'LANG': 'en_US.UTF-8', 'XDG_CURRENT_DESKTOP': 'ubuntu:GNOME', 'XMODIFIERS': '@im=ibus', 'XDG_SESSION_DESKTOP': 'ubuntu', 'XAUTHORITY': '/run/user/1000/.mutter-Xwaylandauth.WT5FP3', 'LS_COLORS': 'rs=0:di=01;34:ln=01;36:mh=00:pi=40;33:so=01;35:do=01;35:bd=40;33;01:cd=40;33;01:or=40;31;01:mi=00:su=37;41:sg=30;43:ca=00:tw=30;42:ow=34;42:st=37;44:ex=01;32:*.tar=01;31:*.tgz=01;31:*.arc=01;31:*.arj=01;31:*.taz=01;31:*.lha=01;31:*.lz4=01;31:*.lzh=01;31:*.lzma=01;31:*.tlz=01;31:*.txz=01;31:*.tzo=01;31:*.t7z=01;31:*.zip=01;31:*.z=01;31:*.dz=01;31:*.gz=01;31:*.lrz=01;31:*.lz=01;31:*.lzo=01;31:*.xz=01;31:*.zst=01;31:*.tzst=01;31:*.bz2=01;31:*.bz=01;31:*.tbz=01;31:*.tbz2=01;31:*.tz=01;31:*.deb=01;31:*.rpm=01;31:*.jar=01;31:*.war=01;31:*.ear=01;31:*.sar=01;31:*.rar=01;31:*.alz=01;31:*.ace=01;31:*.zoo=01;31:*.cpio=01;31:*.7z=01;31:*.rz=01;31:*.cab=01;31:*.wim=01;31:*.swm=01;31:*.dwm=01;31:*.esd=01;31:*.avif=01;35:*.jpg=01;35:*.jpeg=01;35:*.mjpg=01;35:*.mjpeg=01;35:*.gif=01;35:*.bmp=01;35:*.pbm=01;35:*.pgm=01;35:*.ppm=01;35:*.tga=01;35:*.xbm=01;35:*.xpm=01;35:*.tif=01;35:*.tiff=01;35:*.png=01;35:*.svg=01;35:*.svgz=01;35:*.mng=01;35:*.pcx=01;35:*.mov=01;35:*.mpg=01;35:*.mpeg=01;35:*.m2v=01;35:*.mkv=01;35:*.webm=01;35:*.webp=01;35:*.ogm=01;35:*.mp4=01;35:*.m4v=01;35:*.mp4v=01;35:*.vob=01;35:*.qt=01;35:*.nuv=01;35:*.wmv=01;35:*.asf=01;35:*.rm=01;35:*.rmvb=01;35:*.flc=01;35:*.avi=01;35:*.fli=01;35:*.flv=01;35:*.gl=01;35:*.dl=01;35:*.xcf=01;35:*.xwd=01;35:*.yuv=01;35:*.cgm=01;35:*.emf=01;35:*.ogv=01;35:*.ogx=01;35:*.aac=00;36:*.au=00;36:*.flac=00;36:*.m4a=00;36:*.mid=00;36:*.midi=00;36:*.mka=00;36:*.mp3=00;36:*.mpc=00;36:*.ogg=00;36:*.ra=00;36:*.wav=00;36:*.oga=00;36:*.opus=00;36:*.spx=00;36:*.xspf=00;36:*~=00;90:*#=00;90:*.bak=00;90:*.crdownload=00;90:*.dpkg-dist=00;90:*.dpkg-new=00;90:*.dpkg-old=00;90:*.dpkg-tmp=00;90:*.old=00;90:*.orig=00;90:*.part=00;90:*.rej=00;90:*.rpmnew=00;90:*.rpmorig=00;90:*.rpmsave=00;90:*.swp=00;90:*.tmp=00;90:*.ucf-dist=00;90:*.ucf-new=00;90:*.ucf-old=00;90:', 'GNOME_TERMINAL_SERVICE': ':1.141', 'SSH_AUTH_SOCK': '/run/user/1000/keyring/ssh', 'ROS_DOMAIN_ID': '149', 'AMENT_PREFIX_PATH': '/opt/ros/jazzy', 'SHELL': '/bin/bash', 'QT_ACCESSIBILITY': '1', 'GDMSESSION': 'ubuntu', 'LESSCLOSE': '/usr/bin/lesspipe %s %s', 'ROS_AUTOMATIC_DISCOVERY_RANGE': 'SUBNET', 'QT_IM_MODULE': 'ibus', 'PWD': '/home/lele/uni_rob/w2/B/2.2/trajectory_recorder/build/trajectory_recorder', 'XDG_CONFIG_DIRS': '/etc/xdg/xdg-ubuntu:/etc/xdg', 'XDG_DATA_DIRS': '/usr/share/ubuntu:/usr/share/gnome:/usr/local/share/:/usr/share/:/var/lib/snapd/desktop', 'PYTHONPATH': '/opt/ros/jazzy/lib/python3.12/site-packages', 'COLCON': '1', 'MEMORY_PRESSURE_WRITE': 'c29tZSAyMDAwMDAgMjAwMDAwMAA=', 'VTE_VERSION': '7600', 'CMAKE_PREFIX_PATH': '/opt/ros/jazzy/opt/gz_math_vendor:/opt/ros/jazzy/opt/gz_utils_vendor:/opt/ros/jazzy/opt/gz_cmake_vendor:/opt/ros/jazzy'}), 'shell': False}
+[5.973360] (trajectory_recorder) StdoutLine: {'line': b'-- Install configuration: ""\n'}
+[5.973555] (trajectory_recorder) StdoutLine: {'line': b'-- Installing: /home/lele/uni_rob/w2/B/2.2/trajectory_recorder/install/trajectory_recorder/lib/trajectory_recorder/recorder\n'}
+[5.973911] (trajectory_recorder) StdoutLine: {'line': b'-- Set non-toolchain portion of runtime path of "/home/lele/uni_rob/w2/B/2.2/trajectory_recorder/install/trajectory_recorder/lib/trajectory_recorder/recorder" to ""\n'}
+[5.974061] (trajectory_recorder) StdoutLine: {'line': b'-- Installing: /home/lele/uni_rob/w2/B/2.2/trajectory_recorder/install/trajectory_recorder/share/ament_index/resource_index/package_run_dependencies/trajectory_recorder\n'}
+[5.974173] (trajectory_recorder) StdoutLine: {'line': b'-- Installing: /home/lele/uni_rob/w2/B/2.2/trajectory_recorder/install/trajectory_recorder/share/ament_index/resource_index/parent_prefix_path/trajectory_recorder\n'}
+[5.974358] (trajectory_recorder) StdoutLine: {'line': b'-- Installing: /home/lele/uni_rob/w2/B/2.2/trajectory_recorder/install/trajectory_recorder/share/trajectory_recorder/environment/ament_prefix_path.sh\n'}
+[5.974615] (trajectory_recorder) StdoutLine: {'line': b'-- Installing: /home/lele/uni_rob/w2/B/2.2/trajectory_recorder/install/trajectory_recorder/share/trajectory_recorder/environment/ament_prefix_path.dsv\n'}
+[5.974803] (trajectory_recorder) StdoutLine: {'line': b'-- Installing: /home/lele/uni_rob/w2/B/2.2/trajectory_recorder/install/trajectory_recorder/share/trajectory_recorder/environment/path.sh\n'}
+[5.975073] (trajectory_recorder) StdoutLine: {'line': b'-- Installing: /home/lele/uni_rob/w2/B/2.2/trajectory_recorder/install/trajectory_recorder/share/trajectory_recorder/environment/path.dsv\n'}
+[5.975210] (trajectory_recorder) StdoutLine: {'line': b'-- Installing: /home/lele/uni_rob/w2/B/2.2/trajectory_recorder/install/trajectory_recorder/share/trajectory_recorder/local_setup.bash\n'}
+[5.975328] (trajectory_recorder) StdoutLine: {'line': b'-- Installing: /home/lele/uni_rob/w2/B/2.2/trajectory_recorder/install/trajectory_recorder/share/trajectory_recorder/local_setup.sh\n'}
+[5.975461] (trajectory_recorder) StdoutLine: {'line': b'-- Installing: /home/lele/uni_rob/w2/B/2.2/trajectory_recorder/install/trajectory_recorder/share/trajectory_recorder/local_setup.zsh\n'}
+[5.975510] (trajectory_recorder) StdoutLine: {'line': b'-- Installing: /home/lele/uni_rob/w2/B/2.2/trajectory_recorder/install/trajectory_recorder/share/trajectory_recorder/local_setup.dsv\n'}
+[5.975825] (trajectory_recorder) StdoutLine: {'line': b'-- Installing: /home/lele/uni_rob/w2/B/2.2/trajectory_recorder/install/trajectory_recorder/share/trajectory_recorder/package.dsv\n'}
+[5.975871] (trajectory_recorder) StdoutLine: {'line': b'-- Installing: /home/lele/uni_rob/w2/B/2.2/trajectory_recorder/install/trajectory_recorder/share/ament_index/resource_index/packages/trajectory_recorder\n'}
+[5.975996] (trajectory_recorder) StdoutLine: {'line': b'-- Installing: /home/lele/uni_rob/w2/B/2.2/trajectory_recorder/install/trajectory_recorder/share/trajectory_recorder/cmake/trajectory_recorderConfig.cmake\n'}
+[5.976681] (trajectory_recorder) StdoutLine: {'line': b'-- Installing: /home/lele/uni_rob/w2/B/2.2/trajectory_recorder/install/trajectory_recorder/share/trajectory_recorder/cmake/trajectory_recorderConfig-version.cmake\n'}
+[5.976735] (trajectory_recorder) StdoutLine: {'line': b'-- Installing: /home/lele/uni_rob/w2/B/2.2/trajectory_recorder/install/trajectory_recorder/share/trajectory_recorder/package.xml\n'}
+[5.980145] (trajectory_recorder) CommandEnded: {'returncode': 0}
+[5.998554] (trajectory_recorder) JobEnded: {'identifier': 'trajectory_recorder', 'rc': 0}
+[5.999296] (-) EventReactorShutdown: {}
