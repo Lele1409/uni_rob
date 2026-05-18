@@ -1,0 +1,9 @@
+[submodule "ros2_ws/src/volksbot_driver"]
+	path = ros2_ws/src/volksbot_driver
+	url = https://git-ce.rwth-aachen.de/roblab/volksbot_driver
+[submodule "ros2_ws/src/hsfd_gazebo_simulation"]
+	path = ros2_ws/src/hsfd_gazebo_simulation
+	url = https://git-ce.rwth-aachen.de/roblab/hsfd_gazebo_simulation
+[submodule "ros2_ws/src/epos2_motor_controller"]
+	path = ros2_ws/src/epos2_motor_controller
+	url = https://github.com/uos/epos2_motor_controller
