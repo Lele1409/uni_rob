@@ -1,0 +1,70 @@
+1.
+Topic:
+	bietet ein publish-subscribe pattern (vs Service -> request-response)
+	durchgängiger Datenstream (vs Service -> nur daten, wenn requested
+	viele clients (subscriber) und server (publisher) an einem topic (vs service -> mehrere clients, nur ein server)
+
+Node:
+	nodes sollten zuständig sein für eine einzelne Funktion. Zum Beispiel sind Schnittstellen zu Aktoren und Sensoren implementiert in Nodes
+
+Workspace:
+	Arbeitsumgebung für Entwicklung mit ROS2
+
+Package:
+	enthält nodes (source-code), launch-files, roboter-description, etc
+
+================================
+Tools
+
+command line:
+- ros2 topic list (-t zum anzeigen der nachrichten-typen)
+- ros2 topic info <topic>
+- ros2 topic echo <topic> -> gibt die messages aus, die auf diesem Topic gepublished werden
+- ros2 topic publish <topic> <message-type> [values] -> published message in topic
+
+rqt 
+- topic monitor -> Status von topics zu beobachten (auch wie oft die daten ankommen (in hz)
+- service caller -> aufrufen von services 
+- message publisher -> kann messages auf topics publishen
+
+rqt_graph
+- zeigt Verbindungen zwischen Nodes und topics an
+
+rviz
+- visualisiert robot-descriptions (xacro/urdf)
+
+
+
+
+
+3. (wir haben teleop_twist_keyboard zum steuern benutzt)
+- im Topic /cmd_vel werden messages im yaml-Format verschickt
+    bsp: 
+```
+linear:
+  x: 0.5
+  y: 0.0
+  z: 0.0
+angular:
+  x: 0.0
+  y: 0.0
+  z: 1.0
+```
+- abhängig von der Anweisung (drehen/fahren/drehen und fahren) sind die Werte anders
+  -> angular: drehen, linear: fahren
+
+weitere Topics:
+- joint_states
+  -> hier werden die Zustände der translations zwischen den links des Roboters veröffentlicht
+- /tf_static, /tf und /robot_description
+  -> werden vom 'robot_state_publisher' veröffentlicht und bilden den Zustand des Roboters ab basierend auf den Sensoren in Motoren etc
+- /imu/data
+  -> veröffentlicht die daten des imu auf dem Roboter
+    - darunter: 'angular_velocity', 'linear_acceleration', 'orientation'
+- /odom
+  -> beschreibt die Distanz des Roboters zum Ursprung basierend auf Sensordaten
+
+4. 
+Die Simulation besteht aus der Welt 
+Die Welt ist durch eine stl-Datei modelliert, während der Roboter durch urdf-Dateien beschrieben wird. Dabei sind die einzelnen Links in der Simulation vertreten in einer Tree-Struktur
+man kann den simulierten Roboter einfach ersetzen, da der echte Treiber als Blueprint verwendet wird.
