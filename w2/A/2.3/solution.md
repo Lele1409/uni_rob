@@ -6,7 +6,10 @@ Für jede Zeiteinheit bewegt sich der linke MOtor weiter als der rechte, was bed
 
 ## b)
 
-![table.png](table)
+| T | 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 |
+|---|---|---|---|---|---|---|---|---|---|---|
+| **M_L** | 0 | π·3/8 cm | π·3/4 cm | π·9/8 cm | π·3/2 cm | π·15/8 cm | π·9/4 cm | π·21/8 cm | π·3 cm | π·27/8 cm |
+| **M_r** | 0 | 0 | π·3/8 cm | π·3/8 cm | π·3/4 cm | π·3/4 cm | π·9/8 cm | π·9/8 cm | π·1/2 cm | π·1/2 cm |
 
 ## c)
 
