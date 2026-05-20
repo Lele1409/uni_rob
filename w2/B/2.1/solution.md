@@ -49,6 +49,6 @@ $$\boxed{(x_2, z_2, \theta_2)^T \approx (-1{,}13\,\text{cm},\; 13{,}95\,\text{cm
 
 Der Rotationsfehler wirkt sich langfristig stärker aus.
 
-Wie Folie 135 zeigt, gehen in die Positionsberechnung die Terme $\sin(\theta)$ und $\cos(\theta)$ ein. Ein kleiner, konstanter Winkelfehler $\Delta\theta$ bewirkt, dass die Fahrtrichtung dauerhaft falsch ist, der Roboter fährt eine Kurve statt geradeaus. Dadurch wächst der Positionsfehler unbegrenzt an (wie auf Folie 125 explizit festgehalten: „Gesamtfehler der Schätzung durch die Integration praktisch unbeschränkt").
+Wie Folie 135 zeigt, gehen in die Positionsberechnung die Terme $\sin(\theta)$ und $\cos(\theta)$ ein. Ein kleiner, konstanter Winkelfehler $\Delta\theta$ bewirkt, dass die Fahrtrichtung dauerhaft falsch ist, der Roboter fährt eine Kurve statt geradeaus. Dadurch wächst der Positionsfehler unbegrenzt an (Zitat Folie 125: „Gesamtfehler der Schätzung durch die Integration praktisch unbeschränkt").
 
-Ein reiner Translationsfehler hingegen addiert sich zwar auf, ändert aber nicht die Richtung der weiteren Bewegung, der Fehler wächst damit lediglich linear, nicht spiralförmig divergierend wie beim Rotationsfehler.
+Ein reiner Translationsfehler hingegen addiert sich zwar auf, ändert aber nicht die Richtung der weiteren Bewegung, der Fehler wächst damit lediglich linear, nicht wie beim Rotationsfehler.
