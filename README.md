@@ -16,3 +16,10 @@ git submodule update --init --recursive
 
 - In `./wX` sind die Lösungen für die einzelnen Wochen.
 - In `./ros2_ws` ist der Workspace für ros2.
+
+## Kompilieren von .md to .pdf
+
+```bash
+sudo apt install pandoc texlive-latex-recommended
+pandoc file.md -o file.pdf
+```
