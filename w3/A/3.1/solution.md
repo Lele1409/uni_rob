@@ -43,13 +43,20 @@ ros2 bag info Dateiname
 scp -r robot@10.33.130.107:~/ros2_ws/meine_runde ~/#
 ````
 
-### VM: Bagfile abspielen
+### Bagfile abspielen
 
 ````bash
 source /opt/ros/jazzy/setup.bash
 source ~/ros2_ws/install/setup.bash
 ros2 bag play ~/meine_runde --loop
 ````
+### Einstellungen in RVIz
+RVIz öffnen
+````bash
+rviz2
+````
+<img width="1198" height="848" alt="image" src="https://github.com/user-attachments/assets/90ef37ee-0816-4b9f-8001-7d5e7076eb06" />
+
 
 ## Änderungen am recorder
 
