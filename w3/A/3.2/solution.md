@@ -11,3 +11,7 @@ quit first terminal
 
 gnuplot
 plot 'odometry.txt' u 1:2
+
+## Änderungen am recorder
+
+Das originale `recorder.cpp` schrieb Rohbeschleunigungen direkt in `imu.txt` ohne Positionsberechnung. Die neue Version integriert die IMU-Daten zu einer Trajektorie: Geschwindigkeitskomponenten werden via `v_i = a_i * Δt` berechnet, der Betrag `v = sqrt(vx²+vy²+vz²)` ergibt die Schrittweite, und der Drehwinkel wird aus `angular_velocity.z * Δt` akkumuliert. Die berechneten x/y-Koordinaten werden in `imu.txt` gespeichert.
