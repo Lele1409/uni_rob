@@ -39,6 +39,10 @@ source ~/ros2_ws/install/setup.bash
 ros2 bag play ~/meine_runde --loop
 ````
 
+## Änderungen am recorder
+
+Das originale `recorder.cpp` subscribte auf `/odom` und `/imu` und schrieb Rohdaten in die Ausgabedateien. Die neue Version subscribt auf die korrekten Topics `odom` und `imu/data_raw` und nutzt `const nav_msgs::msg::Odometry&` statt `SharedPtr` als Callback-Parameter.
+
 
 
 
