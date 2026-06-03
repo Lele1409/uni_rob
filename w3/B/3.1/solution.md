@@ -1,4 +1,4 @@
-# Lösung Aufgabe B3.1 — Scanmatching (ICP)
+# Lösung Aufgabe B3.1 - Scanmatching (ICP)
 
 Implementiert in `ros2_ws/src/basic_icp/src/BasicICP.cpp`.
 
@@ -36,7 +36,7 @@ Vor dem ICP-Node kann man die initiale Lage der beiden Scans mit dem Static Tran
 ros2 run tf2_ros static_transform_publisher 0 0 0 0 0 0 model laser
 ```
 
-**Diesen Prozess beenden, bevor der ICP-Node gestartet wird** — sonst gibt es Konflikte zwischen dem statischen Publisher und den vom ICP-Node gesendeten Transformationen.
+Diesen Prozess beenden, bevor der ICP-Node gestartet wird sonst gibt es Konflikte zwischen dem statischen Publisher und den vom ICP-Node gesendeten Transformationen.
 
 ### 3. ICP-Node starten
 
@@ -44,7 +44,7 @@ ros2 run tf2_ros static_transform_publisher 0 0 0 0 0 0 model laser
 ros2 run basic_icp basic_icp
 ```
 
-Der Node iteriert mit **0,25 Hz** und gibt pro Iteration Transformation und RMSE-Fehler aus:
+Der Node iteriert mit 0,25 Hz und gibt pro Iteration Transformation und RMSE-Fehler aus:
 
 ```
 [basic_icp_node] Iteration 0 | tx=0.1234  ty=-0.0567  theta=3.8200 deg | RMSE=0.0423
