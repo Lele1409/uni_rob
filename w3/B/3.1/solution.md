@@ -12,11 +12,11 @@ colcon build --packages-select basic_icp
 source install/setup.bash
 ```
 
-## rviz starten
+## RViz starten
 
 Dies geht über den Befehl: `rviz2`
 
-Zuerst muss wie in "Rviz einrichten" eine Konfiguration erstellt werden.
+Zuerst muss wie in "RViz einrichten" eine Konfiguration erstellt werden.
 
 Diese kann dann nun neu geladen werden.
 
