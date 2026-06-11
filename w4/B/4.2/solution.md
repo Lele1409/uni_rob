@@ -55,13 +55,13 @@ ros2 bag play w4/B/4.2/lidar_bag/ --loop
 Direkt mit Parametern:
 
 ```bash
-ros2 run online_line_finder online_line_finder --ros-args -p epsilon:=0.98 -p epsilon_k:=0.98 -p min_points:=5 -p max_point_dist:=0.2
+ros2 run online_line_finder online_line_finder --ros-args -p epsilon:=0.02 -p epsilon_k:=0.02 -p min_points:=5 -p max_point_dist:=0.03
 ```
 
 Oder über das Launch-File:
 
 ```bash
-ros2 launch online_line_finder line_finder.launch.py epsilon:=0.98 epsilon_k:=0.98 min_points:=5 max_point_dist:=0.2
+ros2 launch online_line_finder line_finder.launch.py epsilon:=0.02 epsilon_k:=0.02 min_points:=5 max_point_dist:=0.03
 ```
 
 Der Node gibt pro Scan die Anzahl erkannter Linien aus:
