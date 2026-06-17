@@ -9,4 +9,4 @@
 	url = https://github.com/uos/epos2_motor_controller
 [submodule "ros2_ws/src/robot_localization"]
 	path = ros2_ws/src/robot_localization
-	url = https://github.com/cra-ros-pkg/robot_localization.git
+	url = https://github.com/cra-ros-pkg/robot_localization
