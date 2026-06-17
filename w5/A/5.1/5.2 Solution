@@ -1,0 +1,47 @@
+Preperation
+1) kalman_example.zip im src Ordner von Ros entpacken
+2) package builden mit : `colcon build --packages-select kalman_example`, danach sourcen `source install/setup.bash`
+
+Node starten: 
+cd ~/ros2_ws 
+source install/setup.bash 
+ros2 run kalman_example kalman_example
+
+Topic testen (neues Terminal):
+cd ~/ros2_ws 
+source install/setup.bash 
+ros2 topic list
+ros2 topic echo /object -> Die Höhe der Kugel wird im Feld point.z ausgegeben
+
+RViz: 
+source /opt/ros/$ROS_DISTRO/setup.bash 
+rviz2
+
+In RViz2 folgende Einstellungen vornehmen:
+- Unter Global Options den Wert von Fixed Frame auf world setzen.
+- Unten links auf Add klicken.
+- By topic auswählen.
+- Das Topic /object auswählen.
+- Den Eintrag vom Typ PointStamped hinzufügen.
+-> Die Kugel wird als Punkt auf der z-Achse dargestellt.
+
+(a) Erklären Sie die Modellierung des freien Falls und des Auftreffens der Kugel auf dem ”Boden”
+
+Die Kugel startet in einer Höhe von 5 Metern mit einer Geschwindigkeit von 0 und einer Beschleunigung von -9.81 m/s².
+Das Bewegungsmodell berechnet bei jedem Schritt eine neue Position und Geschwindigkeit. Durch die negative Beschleunigung fällt die Kugel nach unten und wird dabei immer schneller.
+Solange sich die Kugel über dem Boden befindet, wird die vorhergesagte Geschwindigkeit auch als Messwert verwendet.
+Sobald die Kugel den Boden erreicht, wird als gemessene Geschwindigkeit 0 eingesetzt. Dadurch wird simuliert, dass die Kugel nach dem Auftreffen stehen bleibt.
+Die Position wird allerdings nicht direkt auf 0 begrenzt. Deshalb kann sie kurzzeitig etwas unterhalb des Bodens liegen.
+
+(b) Interpretieren Sie die Konsolenausgabe. Warum entwickeln sich die Werte der Pr¨adiktion und Korrektur wie beobachtet?
+
+Während des freien Falls sind x_pred und x_corr fast gleich. Der verwendete Messwert entspricht in dieser Phase genau der vorhergesagten Geschwindigkeit. Deshalb muss der Kalman-Filter kaum etwas korrigieren.
+Die Position wird immer kleiner und die Geschwindigkeit immer negativer. Die Kugel fällt also zunehmend schneller.
+Nach dem Auftreffen sagt das Bewegungsmodell zunächst weiterhin eine negative Geschwindigkeit voraus. Als Messwert wird jedoch 0 verwendet. Dadurch entsteht ein großer Unterschied zwischen Vorhersage und Messung.
+Der Kalman-Filter korrigiert die Geschwindigkeit deshalb deutlich in Richtung 0. Dabei werden auch Position und Beschleunigung verändert, da diese Werte im Modell miteinander zusammenhängen.
+
+(c) Warum strebt die geschätzte Beschleunigung gegen null und wie kommt dieser Effekt zustande?
+
+Die Beschleunigung wird nicht direkt gemessen. Sie beeinflusst aber die vorhergesagte Geschwindigkeit.
+Nach dem Auftreffen wird bei jeder Iteration eine Geschwindigkeit von 0 gemessen. Eine Beschleunigung ungleich 0 würde dagegen immer wieder eine neue Bewegung vorhersagen.
+Der Kalman-Filter korrigiert deshalb nach und nach auch die Beschleunigung. Der Zustand mit Geschwindigkeit 0 und Beschleunigung 0 passt am besten zu einer Kugel, die dauerhaft auf dem Boden liegt.
