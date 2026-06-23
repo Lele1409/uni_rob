@@ -31,7 +31,7 @@ def generate_launch_description():
   #rviz_config_file = LaunchConfiguration('rviz_config_file')
   #use_robot_state_pub = LaunchConfiguration('use_robot_state_pub')
   #use_rviz = LaunchConfiguration('use_rviz')
-  #use_sim_time = LaunchConfiguration('use_sim_time')
+  use_sim_time = LaunchConfiguration('use_sim_time')
   #use_simulator = LaunchConfiguration('use_simulator')
   #world = LaunchConfiguration('world')
 
@@ -61,10 +61,10 @@ def generate_launch_description():
     #default_value='True',
     #description='Whether to start RVIZ')
     
-  #declare_use_sim_time_cmd = DeclareLaunchArgument(
-    #name='use_sim_time',
-    #default_value='True',
-    #description='Use simulation (Gazebo) clock if true')
+  declare_use_sim_time_cmd = DeclareLaunchArgument(
+    name='use_sim_time',
+    default_value='False',
+    description='Use simulation (Gazebo) clock if true')
 
   #declare_use_simulator_cmd = DeclareLaunchArgument(
     #name='use_simulator',
@@ -126,7 +126,7 @@ def generate_launch_description():
   #ld.add_action(declare_simulator_cmd)
   #ld.add_action(declare_use_robot_state_pub_cmd)  
   #ld.add_action(declare_use_rviz_cmd) 
-  #ld.add_action(declare_use_sim_time_cmd)
+  ld.add_action(declare_use_sim_time_cmd)
   #ld.add_action(declare_use_simulator_cmd)
   #ld.add_action(declare_world_cmd)
 
