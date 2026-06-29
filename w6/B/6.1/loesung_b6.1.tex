@@ -98,7 +98,11 @@ $\pBel_1(x=1)=\dots=\pBel_1(x=16)=\tfrac{1}{16}$.
 \textbf{1.\ Der Roboter detektiert eine Landmarke.}
 
 Reine Korrektur über die Gleichverteilung. Die Landmarkenzellen werden mit $0{,}7$, alle übrigen
-mit $0{,}25$ gewichtet; mit $\eta^{-1}=\tfrac{64}{25}$ ergibt sich
+mit $0{,}25$ gewichtet. Mit
+\[
+  \eta^{-1} = \frac{320}{5\cdot 14 + 11\cdot 5} = \frac{320}{125}
+\]
+ergibt sich
 \[
   \Bel_1(x) =
   \begin{cases}
@@ -121,9 +125,13 @@ um $2$ Zellen verschoben:
 
 \textbf{3.\ Der Roboter detektiert wieder eine Landmarke.}
 
-Korrektur wie in Schritt~1, mit $\eta^{-1}=\tfrac{2500}{931}$. Hier müssen explizit mehrere Fälle
+Korrektur wie in Schritt~1. Hier müssen explizit mehrere Fälle
 unterschieden werden, je nachdem ob eine verschobene Wahrscheinlichkeit auf eine Landmarkenzelle
-trifft:
+trifft. Mit
+\[
+  \eta^{-1} = \frac{10000}{8\cdot 280 + 7\cdot 100 + 784} = \frac{10000}{3724}
+\]
+ergibt sich:
 \[
   \Bel_3(x) =
   \begin{cases}
@@ -148,7 +156,11 @@ Wie in Schritt~2 werden die Wahrscheinlichkeiten nur verschoben (um $4$ Zellen):
 \textbf{5.\ Der Roboter detektiert keine Landmarke.}
 
 Dies verläuft analog zu Schritt~3, lediglich nun mit den Gegenwahrscheinlichkeiten
-($0{,}3$ bzw.\ $0{,}75$) und $\eta^{-1}=\tfrac{1862}{1203}$:
+($0{,}3$ bzw.\ $0{,}75$). Mit
+\[
+  \eta^{-1} = \frac{3724}{588 + 2\cdot 84 + 6\cdot 210 + 3\cdot 30 + 4\cdot 75} = \frac{3724}{2406}
+\]
+ergibt sich:
 \[
   \Bel_5(x) =
   \begin{cases}
@@ -201,7 +213,11 @@ werden (z.\,B.\ Zelle~$1$ aus Zelle~$3$ und Zelle~$15$):
 
 \textbf{3.\ Der Roboter detektiert wieder eine Landmarke.}
 
-Korrektur mit $\eta^{-1}=\tfrac{2500}{931}$:
+Korrektur. Mit
+\[
+  \eta^{-1} = \frac{5000}{2\cdot 266 + 5\cdot 140 + 4\cdot 95 + 5\cdot 50} = \frac{5000}{1862}
+\]
+ergibt sich:
 \[
   \Bel_3(x) =
   \begin{cases}
@@ -229,7 +245,11 @@ Korrektur mit $\eta^{-1}=\tfrac{2500}{931}$:
 
 \textbf{5.\ Der Roboter detektiert keine Landmarke.}
 
-Genauso wie Schritt~3, nur mit den Gegenwahrscheinlichkeiten und $\eta^{-1}=\tfrac{392}{249}$:
+Genauso wie Schritt~3, nur mit den Gegenwahrscheinlichkeiten. Mit
+\[
+  \eta^{-1} = \frac{14896}{2\cdot 228 + 4\cdot 948 + 4\cdot 705 + 2\cdot 174 + 840 + 2\cdot 435 + 336} = \frac{14896}{9462}
+\]
+ergibt sich:
 \[
   \Bel_5(x) =
   \begin{cases}
