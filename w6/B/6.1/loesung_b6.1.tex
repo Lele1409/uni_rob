@@ -1,0 +1,252 @@
+\documentclass[11pt,a4paper]{article}
+
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[ngerman]{babel}
+\usepackage{lmodern}
+\usepackage{amsmath,amssymb,mathtools}
+\usepackage{booktabs,array}
+\usepackage{enumitem}
+\usepackage{geometry}
+\usepackage{hyperref}
+
+\geometry{left=25mm,right=25mm,top=24mm,bottom=27mm}
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{0.6em}
+\setlist[itemize]{itemsep=0.2em,topsep=0.2em}
+\setlist[enumerate]{itemsep=0.2em,topsep=0.2em}
+\renewcommand{\arraystretch}{1.25}
+
+\newcommand{\Bel}{\operatorname{Bel}}
+\newcommand{\pBel}{\overline{\operatorname{Bel}}}
+\newcommand{\LM}{\mathrm{L}}
+
+\title{Lösung zu Aufgabe B6.1 (Markow-Lokalisierung)}
+\author{}
+\date{}
+
+\begin{document}
+\maketitle
+
+\section*{Aufgabenstellung und Modell}
+
+Der Roboter bewegt sich deterministisch in einem ringförmigen Korridor mit $16$ Gitterzellen
+($x=1,\dots,16$, im Uhrzeigersinn aufsteigend nummeriert). In den Zellen
+\[
+  \{1,\,4,\,6,\,9,\,13\}
+\]
+sind Landmarken angebracht. Befindet sich der Roboter in einer Zelle mit Landmarke, so detektiert
+er diese mit Wahrscheinlichkeit $70\%$. In allen anderen Zellen meldet er aufgrund der
+Sensorungenauigkeit dennoch mit $25\%$ Wahrscheinlichkeit eine Landmarke.
+
+\begin{center}
+\setlength{\tabcolsep}{8pt}
+\begin{tabular}{|c|c|c|c|c|}
+\hline
+$1^{\bullet}$ & $2$ & $3$ & $4^{\bullet}$ & $5$ \\\hline
+$16$ & & & & $6^{\bullet}$ \\\hline
+$15$ & & & & $7$ \\\hline
+$14$ & & & & $8$ \\\hline
+$13^{\bullet}$ & $12$ & $11$ & $10$ & $9^{\bullet}$ \\\hline
+\end{tabular}
+\end{center}
+{\small ($^{\bullet}$ = Zelle mit Landmarke)}
+
+Der Roboter führt die folgenden $5$ Aktionen aus:
+\begin{enumerate}
+  \item Der Roboter detektiert eine Landmarke.
+  \item Der Roboter bewegt sich $2$ Zellen im Uhrzeigersinn.
+  \item Der Roboter detektiert wieder eine Landmarke.
+  \item Der Roboter bewegt sich $4$ Zellen im Uhrzeigersinn.
+  \item Der Roboter detektiert keine Landmarke.
+\end{enumerate}
+
+Gegeben sind damit die folgenden Mess\-wahr\-schein\-lich\-keiten:
+
+\begin{center}
+\setlength{\tabcolsep}{10pt}
+\begin{tabular}{c|cc}
+\toprule
+ & $x=\LM$ & $x=\neg\LM$ \\
+\midrule
+$z=\LM$       & $0{,}7$ & $0{,}25$ \\
+$z=\neg\LM$   & $0{,}3$ & $0{,}75$ \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+Für die rekursive Berechnung der Aufenthaltswahrscheinlichkeit verwenden wir die
+Prädiktion (a-priori-Schätzung) und die Korrektur (a-posteriori-Schätzung):
+\[
+  \pBel(x_{t+1}) = \sum_{x_t} P(x_{t+1}\mid x_t,u_t)\cdot \Bel(x_t),
+  \qquad
+  \Bel(x_{t+1}) = \eta\cdot P(z_t\mid x_{t+1})\cdot \pBel(x_{t+1}),
+\]
+mit dem Normierungsfaktor
+\[
+  \eta^{-1} = \sum_{x_{t+1}} P(z_t\mid x_{t+1})\cdot \pBel(x_{t+1}).
+\]
+Allgemein gilt zu jedem Zeitpunkt
+\[
+  \Bel(x=1)+\Bel(x=2)+\dots+\Bel(x=16) = 1.
+\]
+Als Startverteilung nehmen wir die Gleichverteilung an, also
+$\Bel_0(x=1)=\dots=\Bel_0(x=16)=\tfrac{1}{16}$.
+
+\section*{Berechnung der Aufenthaltswahrscheinlichkeit (mit vorgegebener Richtung)}
+
+\textbf{1.\ Der Roboter detektiert eine Landmarke.}
+
+Reine Korrektur über die Gleichverteilung. Die Landmarkenzellen werden mit $0{,}7$, alle übrigen
+mit $0{,}25$ gewichtet; mit $\eta^{-1}=\tfrac{25}{64}$ ergibt sich
+\[
+  \Bel_1(x) =
+  \begin{cases}
+    \tfrac{14}{125}\approx 0{,}112 & x\in\{1,4,6,9,13\},\\[0.3em]
+    \tfrac{1}{25}=0{,}04 & \text{sonst.}
+  \end{cases}
+\]
+
+\textbf{2.\ Der Roboter bewegt sich $2$ Zellen im Uhrzeigersinn.}
+
+Reine Prädiktion. Da die Bewegung deterministisch ist, werden die Wahrscheinlichkeiten lediglich
+um $2$ Zellen verschoben:
+\[
+  \Bel_2(x) =
+  \begin{cases}
+    0{,}112 & x\in\{3,6,8,11,15\},\\
+    0{,}04  & \text{sonst.}
+  \end{cases}
+\]
+
+\textbf{3.\ Der Roboter detektiert wieder eine Landmarke.}
+
+Korrektur wie in Schritt~1, mit $\eta^{-1}=\tfrac{931}{2500}$. Hier müssen explizit mehrere Fälle
+unterschieden werden, je nachdem ob eine verschobene Wahrscheinlichkeit auf eine Landmarkenzelle
+trifft:
+\[
+  \Bel_3(x) =
+  \begin{cases}
+    \tfrac{4}{19}\approx 0{,}2105 & x=6,\\[0.3em]
+    \tfrac{10}{133}\approx 0{,}0752 & x\in\{1,3,4,8,9,11,13,15\},\\[0.3em]
+    \tfrac{25}{931}\approx 0{,}0269 & x\in\{2,5,7,10,12,14,16\}.
+  \end{cases}
+\]
+
+\textbf{4.\ Der Roboter bewegt sich $4$ Zellen im Uhrzeigersinn.}
+
+Wie in Schritt~2 werden die Wahrscheinlichkeiten nur verschoben (um $4$ Zellen):
+\[
+  \Bel_4(x) =
+  \begin{cases}
+    0{,}2105 & x=10,\\
+    0{,}0752 & x\in\{1,3,5,7,8,12,13,15\},\\
+    0{,}0269 & x\in\{2,4,6,9,11,14,16\}.
+  \end{cases}
+\]
+
+\textbf{5.\ Der Roboter detektiert keine Landmarke.}
+
+Dies verläuft analog zu Schritt~3, lediglich nun mit den Gegenwahrscheinlichkeiten
+($0{,}3$ bzw.\ $0{,}75$) und $\eta^{-1}=\tfrac{1203}{1862}$:
+\[
+  \Bel_5(x) =
+  \begin{cases}
+    \tfrac{98}{401}\approx 0{,}2444 & x=10,\\[0.3em]
+    \tfrac{35}{401}\approx 0{,}0873 & x\in\{3,5,7,8,12,15\},\\[0.3em]
+    \tfrac{14}{401}\approx 0{,}0349 & x\in\{1,13\},\\[0.3em]
+    \tfrac{25}{802}\approx 0{,}0312 & x\in\{2,11,14,16\},\\[0.3em]
+    \tfrac{5}{401}\approx 0{,}0125 & x\in\{4,6,9\}.
+  \end{cases}
+\]
+
+Dies bedeutet, dass mit der höchsten Wahrscheinlichkeit schlussendlich Zelle~$10$ erreicht wird
+($\Bel_5(x=10)=0{,}244$). Rechnet man dies mittels der Aktionen (insgesamt $6$ Zellen im
+Uhrzeigersinn) zurück, so korrespondiert dies zu \textbf{Zelle~4 als wahrscheinlichstem
+Startpunkt}.
+
+\section*{Berechnung der Aufenthaltswahrscheinlichkeit (mit unbekannter Richtung)}
+
+Da nun keine Angabe über die Bewegungsrichtung vorliegt, gehen wir von einer
+$50/50$-Verteilung für die Richtung (im bzw.\ entgegen dem Uhrzeigersinn) aus. Die Korrektur\-schritte
+($1$, $3$, $5$) bleiben unverändert; lediglich die Prädiktion wird zu
+\[
+  \pBel(x_{t+1}) = \tfrac{1}{2}\,\Bel(x_{t+1}-d) + \tfrac{1}{2}\,\Bel(x_{t+1}+d),
+\]
+da jede Zelle nun aus zwei Vorzuständen erreichbar ist ($d$ = zurückgelegte Zellenzahl).
+
+\textbf{1.\ Der Roboter detektiert eine Landmarke.}
+
+Die Ergebnisse lassen sich $1{:}1$ aus dem ersten Aufgabenteil übertragen:
+\[
+  \Bel_1(x) =
+  \begin{cases}
+    \tfrac{14}{125}\approx 0{,}112 & x\in\{1,4,6,9,13\},\\[0.3em]
+    \tfrac{1}{25}=0{,}04 & \text{sonst.}
+  \end{cases}
+\]
+
+\textbf{2.\ Der Roboter bewegt sich $2$ Zellen.}
+
+Grundsätzlich das gleiche Vorgehen, jedoch kann jede Zelle stets aus zwei Vorzuständen erreicht
+werden (z.\,B.\ Zelle~$1$ aus Zelle~$3$ und Zelle~$15$):
+\[
+  \Bel_2(x) =
+  \begin{cases}
+    0{,}112 & x\in\{11,15\},\\
+    \tfrac{19}{250}=0{,}076 & x\in\{2,3,4,6,7,8\},\\
+    0{,}04  & x\in\{1,5,9,10,12,13,14,16\}.
+  \end{cases}
+\]
+
+\textbf{3.\ Der Roboter detektiert wieder eine Landmarke.}
+
+Korrektur mit $\eta^{-1}=\tfrac{931}{2500}$:
+\[
+  \Bel_3(x) =
+  \begin{cases}
+    \tfrac{1}{7}\approx 0{,}1429 & x\in\{4,6\},\\[0.3em]
+    \tfrac{10}{133}\approx 0{,}0752 & x\in\{1,9,11,13,15\},\\[0.3em]
+    \tfrac{5}{98}\approx 0{,}0510 & x\in\{2,3,7,8\},\\[0.3em]
+    \tfrac{25}{931}\approx 0{,}0269 & x\in\{5,10,12,14,16\}.
+  \end{cases}
+\]
+
+\textbf{4.\ Der Roboter bewegt sich $4$ Zellen.}
+
+Ähnlich zu Schritt~2 gibt es je $2$ Vorzustände, aus denen ein Feld erreicht werden kann
+(z.\,B.\ Feld~$5$ aus $1$ und $9$):
+\[
+  \Bel_4(x) =
+  \begin{cases}
+    \tfrac{79}{931}\approx 0{,}0849 & x\in\{2,8,10,16\},\\[0.3em]
+    \tfrac{10}{133}\approx 0{,}0752 & x\in\{5,13\},\\[0.3em]
+    \tfrac{235}{3724}\approx 0{,}0631 & x\in\{3,7,11,15\},\\[0.3em]
+    \tfrac{5}{98}\approx 0{,}0510 & x\in\{1,9\},\\[0.3em]
+    \tfrac{145}{3724}\approx 0{,}0389 & x\in\{4,6,12,14\}.
+  \end{cases}
+\]
+
+\textbf{5.\ Der Roboter detektiert keine Landmarke.}
+
+Genauso wie Schritt~3, nur mit den Gegenwahrscheinlichkeiten und $\eta^{-1}=\tfrac{249}{392}$:
+\[
+  \Bel_5(x) =
+  \begin{cases}
+    \tfrac{158}{1577}\approx 0{,}1002 & x\in\{2,8,10,16\},\\[0.3em]
+    \tfrac{140}{1577}\approx 0{,}0888 & x=5,\\[0.3em]
+    \tfrac{235}{3154}\approx 0{,}0745 & x\in\{3,7,11,15\},\\[0.3em]
+    \tfrac{145}{3154}\approx 0{,}0460 & x\in\{12,14\},\\[0.3em]
+    \tfrac{56}{1577}\approx 0{,}0355 & x=13,\\[0.3em]
+    \tfrac{2}{83}\approx 0{,}0241 & x\in\{1,9\},\\[0.3em]
+    \tfrac{29}{1577}\approx 0{,}0184 & x\in\{4,6\}.
+  \end{cases}
+\]
+
+Hier sind am wahrscheinlichsten die Zellen $2$, $8$, $10$ oder $16$ als Endposition
+(mit $\Bel_5\approx 0{,}1$). Jedoch ist alles allgemein sehr unklar geworden, nicht so eindeutig
+wie bei der anderen Aufgabe. Eine Rückrechnung auf den wahrscheinlichsten Initialzustand wäre zwar
+grundsätzlich möglich, würde allerdings aufgrund der gewichteten Kanten mit der zusätzlichen
+Komplexität den Rahmen etwas sprengen.
+
+\end{document}
