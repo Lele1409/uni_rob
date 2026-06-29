@@ -1,0 +1,6 @@
+map_server:
+  ros__parameters:
+    frame_id: map   
+    topic_name: map
+    use_sim_time: false
+    yaml_filename: "maps/avz_6_floor_gazebo.yaml"
