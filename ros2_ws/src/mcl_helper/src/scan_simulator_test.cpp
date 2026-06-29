@@ -19,7 +19,7 @@ public:
     ScanSimulatorNode() : rclcpp::Node("scan_simulator_node")
     {
         // Create policiy for received maps
-        auto map_qos = rclcpp::QoS(rclcpp::KeepLast(10), rmw_qos_profile_sensor_data);
+        auto map_qos = rclcpp::QoS(rclcpp::KeepLast(10), rmw_qos_profile_sensor_data).reliable();
 
         // Subscribe to /map with QoS policy
         map_sub_ = this->create_subscription<nav_msgs::msg::OccupancyGrid>(
