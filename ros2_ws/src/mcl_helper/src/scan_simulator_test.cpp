@@ -44,23 +44,39 @@ private:
     {
         // Print message and store received map in scan simulator
         std::cout << "Got map" << std::endl;
-        
-        // TODO: Add received map to scan simulator
+
+        map_ = map;
+        scan_simulator_.setMap(*map);
     }
 
     void poseCallback(geometry_msgs::msg::PoseStamped::SharedPtr pose_stamped)
     {
         std::cout << "Got pose" << std::endl;
 
-        // TODO (1):
-        // Setup laser scan message meta data (resolution, field of view, ranges)
-        
-        // TODO (2):
-        // Simulate scan with our scan simulator. Publish simulated scan
-       
-        // TODO (3):
-        // Setup transformation message and publish via transform broadcaster
-       
+        // TODO (1): Setup laser scan message meta data
+        sensor_msgs::msg::LaserScan scan;
+        scan.header.stamp = this->now();
+        scan.header.frame_id = "scan_simulator";
+        scan.angle_min = -1.5708;
+        scan.angle_max = +1.5708;
+        scan.range_min = 0;
+        scan.range_max = 10;
+        scan.angle_increment = 0.0174553;
+
+        // TODO (2): Simulate scan and publish
+        scan_simulator_.simulateScan(pose_stamped->pose, scan);
+        scan_pub_->publish(scan);
+
+        // TODO (3): Setup transformation and publish via broadcaster
+        geometry_msgs::msg::TransformStamped transform;
+        transform.header.stamp = this->now();
+        transform.header.frame_id = "map";
+        transform.child_frame_id = "scan_simulator";
+        transform.transform.translation.x = pose_stamped->pose.position.x;
+        transform.transform.translation.y = pose_stamped->pose.position.y;
+        transform.transform.translation.z = pose_stamped->pose.position.z;
+        transform.transform.rotation = pose_stamped->pose.orientation;
+        broadcaster_->sendTransform(transform);
     }
 
     /// @brief  Subscriber to the /map topic. Used to get the grid map from 
