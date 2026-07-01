@@ -10,6 +10,7 @@
 \usepackage{geometry}
 \usepackage{xcolor}
 \usepackage[most]{tcolorbox}
+\usepackage{tikz}
 \usepackage{hyperref}
 
 \geometry{left=25mm,right=25mm,top=24mm,bottom=27mm}
@@ -71,17 +72,24 @@ Sie auch hier die Aufenthaltswahrscheinlichkeiten.
 Der ringförmige Korridor mit den Landmarkenzellen $\{1,4,6,9,13\}$:
 
 \begin{center}
-\setlength{\tabcolsep}{8pt}
-\begin{tabular}{|c|c|c|c|c|}
-\hline
-$1^{\bullet}$ & $2$ & $3$ & $4^{\bullet}$ & $5$ \\\hline
-$16$ & & & & $6^{\bullet}$ \\\hline
-$15$ & & & & $7$ \\\hline
-$14$ & & & & $8$ \\\hline
-$13^{\bullet}$ & $12$ & $11$ & $10$ & $9^{\bullet}$ \\\hline
-\end{tabular}
+\begin{tikzpicture}[x=1cm,y=1cm]
+  % Ringzellen -- die Mitte bleibt leer, sodass nur ein Kreis entsteht
+  \foreach \c/\r/\lab in {%
+    0/0/1, 1/0/2, 2/0/3, 3/0/4, 4/0/5,
+    0/1/16, 4/1/6,
+    0/2/15, 4/2/7,
+    0/3/14, 4/3/8,
+    0/4/13, 1/4/12, 2/4/11, 3/4/10, 4/4/9}{%
+    \draw (\c,-\r) rectangle ++(1,-1);
+    \node at (\c+0.5,-\r-0.5) {$\lab$};
+  }
+  % Landmarken als schwarze Quadrate in der Zellenecke
+  \foreach \c/\r in {0/0, 3/0, 4/1, 0/4, 4/4}{%
+    \fill (\c,-\r) rectangle ++(0.2,-0.2);
+  }
+\end{tikzpicture}
 \end{center}
-{\small ($^{\bullet}$ = Zelle mit Landmarke)}
+{\small (Die schwarzen Quadrate markieren die Zellen mit Landmarken $\{1,4,6,9,13\}$.)}
 
 Gegeben sind die folgenden Wahrscheinlichkeiten:
 
@@ -132,7 +140,7 @@ Dies bedeutet, dass nach dem ersten Schritt folgende Wsk.\ herrschen:
   \Bel_1(x) =
   \begin{cases}
     \tfrac{14}{125}=0.112 & x\in\{1,4,6,9,13\},\\[0.3em]
-    \tfrac{5}{125}=0.04   & \text{sonst.}
+    \tfrac{5}{125}=0.04   & x\in\{2,3,5,7,8,10,11,12,14,15,16\}.
   \end{cases}
 \]
 
@@ -143,7 +151,7 @@ Hier werden lediglich die Aufenthaltswahrscheinlichkeiten verschoben:
   \pBel_2(x) =
   \begin{cases}
     0.112 & x\in\{3,6,8,11,15\},\\
-    0.04  & \text{sonst.}
+    0.04  & x\in\{1,2,4,5,7,9,10,12,13,14,16\}.
   \end{cases}
 \]
 
@@ -246,7 +254,7 @@ Hier lassen sich die Ergebnisse einfach $1{:}1$ übertragen:
   \Bel_1(x) =
   \begin{cases}
     \tfrac{14}{125}=0.112 & x\in\{1,4,6,9,13\},\\[0.3em]
-    \tfrac{5}{125}=0.04   & \text{sonst.}
+    \tfrac{5}{125}=0.04   & x\in\{2,3,5,7,8,10,11,12,14,15,16\}.
   \end{cases}
 \]
 
