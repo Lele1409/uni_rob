@@ -1,0 +1,38 @@
+# Parameters of the exploration_supervisor node (scripts/exploration_supervisor.py).
+# It stops exploration on completion, stagnation or timeout, stops the robot and saves the map.
+exploration_supervisor:
+  ros__parameters:
+    # --- Stop conditions ---
+    # Time budget in seconds, counted from the first received map (<= 0 disables it).
+    max_duration_s: 600.0
+    # Stagnation: stop if the known map area grows by less than min_new_area_m2
+    # within the last stagnation_window_s seconds (window <= 0 disables it).
+    stagnation_window_s: 90.0
+    min_new_area_m2: 0.5
+    # Stagnation is not checked during the first seconds, while SLAM and Nav2 settle.
+    startup_grace_s: 20.0
+    # How often the stop conditions are evaluated.
+    check_period_s: 1.0
+
+    # --- Interfaces ---
+    map_topic: /map
+    # frontier_explorer (root namespace) creates both with relative names:
+    # completion_event_topic "exploration_complete" and service "control_exploration".
+    # The explorer needs completion_event_enabled: true and control_service_enabled: true.
+    completion_topic: /exploration_complete
+    control_service: /control_exploration
+    navigate_action: /navigate_to_pose
+    map_saver_service: /map_saver/save_map
+    serialize_service: /slam_toolbox/serialize_map
+    # Raupy expects geometry_msgs/TwistStamped here.
+    cmd_vel_topic: /cmd_vel
+    # Upper bound for each service wait/call in the stop sequence.
+    service_timeout_s: 10.0
+
+    # --- Output ---
+    # Files: <map_output_dir>/<map_name>_<YYYYmmdd_HHMMSS>.{yaml,pgm,posegraph,data} + _summary.yaml
+    map_name: raupy_map
+    # Empty means ~/raupy_maps.
+    map_output_dir: ""
+    # Exit after the stop sequence (false: stay idle).
+    shutdown_on_finish: true

@@ -1,0 +1,26 @@
+# laser_filters scan_to_scan_filter_chain: removes chassis returns from Raupy's raw /scan.
+#
+# The top-level key MUST equal the node name set in slam.launch.py ("scan_filter").
+# On the robot the YAML key ("laser_filter") did not match the node name
+# ("laser_filters"), so the node started with an empty chain; that is the likely
+# reason its /scan_filtered stayed silent. Parameters under a wrong key are simply ignored.
+scan_filter:
+  ros__parameters:
+    filter1:
+      name: chassis_box
+      type: laser_filters/LaserScanBoxFilter
+      params:
+        # Box is defined in base_link so it moves with the robot, independent of the
+        # lidar mount (base_link -> laser is xyz 0.020/0/0.131, yaw -90 deg).
+        # Robot's own rosbot_utils box: x -0.17..0.10, y +-0.12, z 0..0.2.
+        # We add ~2 cm margin (5 cm in z) so cables/cover edges never leak into the map.
+        box_frame: base_link
+        min_x: -0.19
+        max_x: 0.12
+        min_y: -0.14
+        max_y: 0.14
+        # Lidar plane is at z=0.131, so z 0..0.25 comfortably contains all beams.
+        min_z: 0.0
+        max_z: 0.25
+        # false: remove points INSIDE the box (the chassis), keep everything else.
+        invert: false
