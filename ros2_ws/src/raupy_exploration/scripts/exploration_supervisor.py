@@ -125,6 +125,8 @@ class ExplorationSupervisor(Node):
         self.create_timer(check_period_s, self._on_check, callback_group=monitor_group)
 
         self.cmd_vel_pub = self.create_publisher(TwistStamped, cmd_vel_topic, 10)
+        # Latched "the run is over": stuck_monitor's rescue must not restart the explorer after this.
+        self.stopped_pub = self.create_publisher(Empty, '/exploration_stopped', LATCHED_QOS)
 
         self.control_client = None
         if ControlExploration is not None:
@@ -180,6 +182,7 @@ class ExplorationSupervisor(Node):
             return
 
         self.stop_started = True
+        self.stopped_pub.publish(Empty())
         self.get_logger().warn(
             f'STOP: reason={reason}, after {elapsed:.1f} s, '
             f'known area {self.known_area:.2f} m^2. Running stop sequence.')

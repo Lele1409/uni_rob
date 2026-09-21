@@ -12,6 +12,8 @@ install(PROGRAMS
   scripts/exploration_supervisor.py
   scripts/fake_raupy.py
   scripts/scan_relay.py
+  scripts/range_relay.py
+  scripts/stuck_monitor.py
   DESTINATION lib/${PROJECT_NAME}
 )
 

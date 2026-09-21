@@ -1,0 +1,49 @@
+# Parameters of stuck_monitor (scripts/stuck_monitor.py, logic in raupy_exploration/stuck_logic.py).
+# Stuck = /cmd_vel commands |v| >= min_cmd_speed for at least min_cmd_fraction of the last
+# window_s seconds, while at most max_changed_fraction of the lidar beams changed by more
+# than change_abs_tol + change_rel_tol * range over that window.
+#
+# Tuning: `ros2 topic echo /stuck_monitor/scan_change` shows the changed fraction whenever
+# the robot is being commanded to drive. It must stay well above max_changed_fraction
+# while it really drives, and below it while it is stuck.
+stuck_monitor:
+  ros__parameters:
+    window_s: 5.0
+    min_cmd_speed: 0.05
+    min_cmd_fraction: 0.9
+    max_changed_fraction: 0.10
+    change_abs_tol: 0.05
+    change_rel_tol: 0.02
+    # No second detection this long after one (lets Nav2 recover first).
+    cooldown_s: 10.0
+    # Virtual obstacle: a line of points this far ahead of / behind base_link, just outside
+    # the footprint (robot_radius 0.17 + 0.01 padding in nav2_raupy.yaml), across
+    # +-obstacle_half_width.
+    obstacle_x_offset: 0.21
+    obstacle_half_width: 0.15
+    map_frame: map
+    base_frame: base_link
+
+    # --- Rescue (see scripts/stuck_monitor.py) ---
+    # After STUCK or NO PROGRESS: pause explorer, cancel Nav2, drive escape_distance away
+    # (straight on /cmd_vel, guarded by the ToF sensors + lidar on that side), resume explorer.
+    rescue_enabled: true
+    # NO PROGRESS = a navigate_to_pose goal active for most of this window while the SLAM pose
+    # moved less than no_progress_min_dist and turned less than no_progress_min_yaw.
+    no_progress_window_s: 20.0
+    no_progress_min_dist: 0.10
+    no_progress_min_yaw: 0.35
+    escape_distance: 0.15
+    escape_speed: 0.06
+    escape_timeout_s: 6.0
+    # Free space required beyond the escape distance (ToF reading / lidar corridor).
+    escape_clearance: 0.05
+    # Wait after cancelling Nav2 so its last commands have stopped before we drive.
+    settle_s: 1.5
+    # No new rescue this long after one.
+    rescue_cooldown_s: 15.0
+    # Measured chassis (from base_link) and ToF sensor position |x|.
+    front_edge: 0.10
+    rear_edge: 0.12
+    chassis_half_width: 0.14
+    tof_x: 0.093
