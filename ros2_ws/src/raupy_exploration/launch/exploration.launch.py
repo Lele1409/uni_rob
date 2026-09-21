@@ -1,13 +1,21 @@
 """One-command laptop bringup for autonomous exploration on Raupy.
 
     slam.launch.py        scan filter (/scan -> /scan_clean) + slam_toolbox (/map, TF map->odom)
-    navigation.launch.py  Nav2 (navigate_to_pose, costmaps) + map_saver
+    navigation.launch.py  Nav2 (navigate_to_pose, costmaps) + map_saver + range_relay
     frontier_explorer     library node, started after explorer_start_delay_s
     exploration_supervisor  stops exploration (complete / timeout / stagnation) and saves the map
+    stuck_monitor         marks spots where the robot got stuck on unseen obstacles
     rviz2                 optional
 
 The robot only runs its preinstalled services (driver, EKF, lidar); everything above runs here.
+
+On the real robot, use_bridge:=true robot_domain:=<id> starts domain_bridge (config/domain_bridge.yaml)
+and the stack itself must run on a separate, laptop-only ROS_DOMAIN_ID: then only the bridge
+talks to the robot over Wi-Fi. scripts/raupy_explore.sh sets this up.
 """
+
+import os
+
 
 from launch import LaunchDescription
 from launch.actions import (
@@ -72,6 +80,32 @@ def _launch_supervisor(context, *args, **kwargs):
     ]
 
 
+def _launch_bridge(context, *args, **kwargs):
+    if not _as_bool(LaunchConfiguration('use_bridge').perform(context)):
+        return []
+    robot_domain = LaunchConfiguration('robot_domain').perform(context).strip()
+    stack_domain = os.environ.get('ROS_DOMAIN_ID', '0')
+    if not robot_domain.isdigit():
+        raise RuntimeError("use_bridge:=true needs robot_domain:=<robot's ROS_DOMAIN_ID>")
+    if robot_domain == stack_domain:
+        raise RuntimeError(
+            f'The stack runs on ROS_DOMAIN_ID={stack_domain}, the same as the robot. With the '
+            'bridge it must use its own domain (see scripts/raupy_explore.sh).')
+    return [
+        Node(
+            package='domain_bridge',
+            executable='domain_bridge',
+            name='raupy_bridge',
+            output='screen',
+            arguments=[
+                LaunchConfiguration('bridge_config').perform(context),
+                '--from', robot_domain, '--to', stack_domain],
+            # The stack may be restricted to localhost; the bridge must reach the robot.
+            additional_env={'ROS_AUTOMATIC_DISCOVERY_RANGE': 'SUBNET'},
+        )
+    ]
+
+
 def generate_launch_description():
     use_sim_time = LaunchConfiguration('use_sim_time')
 
@@ -83,11 +117,17 @@ def generate_launch_description():
             'scan_topic', default_value='/scan',
             description='Raw LaserScan topic from the robot.'),
         DeclareLaunchArgument(
+            'laser_yaw_fix', default_value='',
+            description="Override the robot URDF's lidar yaw in rad (Raupy: 3.14159). Empty = trust the robot."),
+        DeclareLaunchArgument(
             'use_scan_filter', default_value='true',
             description='Filter chassis returns (scan_topic -> /scan_clean) before SLAM.'),
         DeclareLaunchArgument(
             'use_rviz', default_value='true',
             description='Start RViz with rviz/exploration.rviz.'),
+        DeclareLaunchArgument(
+            'rviz_config', default_value=_share('rviz', 'exploration.rviz'),
+            description='RViz layout (raupy_explore.sh passes a copy with a lower frame rate).'),
         DeclareLaunchArgument(
             'explorer_params_file', default_value=_share('config', 'explorer_raupy.yaml'),
             description='frontier_explorer parameter file.'),
@@ -116,6 +156,30 @@ def generate_launch_description():
             'map_output_dir', default_value='',
             description='Supervisor: output directory for the map (empty = supervisor default).'),
         DeclareLaunchArgument(
+            'use_range_sensors', default_value='true',
+            description='Use the low ToF sensors (/range/*) for obstacles below the lidar.'),
+        DeclareLaunchArgument(
+            'range_fov_scale', default_value='0.5',
+            description='Scale the ToF cone (driver: 15 deg) marked in the costmap; 0.5 = 7.5 deg.'),
+        DeclareLaunchArgument(
+            'range_cutoff', default_value='0.0',
+            description='Ignore ToF hits farther than this in m (0 = sensor max).'),
+        DeclareLaunchArgument(
+            'use_bridge', default_value='false',
+            description='Start domain_bridge between the robot domain and this (stack) domain.'),
+        DeclareLaunchArgument(
+            'robot_domain', default_value='',
+            description="Robot's ROS_DOMAIN_ID, for use_bridge:=true."),
+        DeclareLaunchArgument(
+            'bridge_config', default_value=_share('config', 'domain_bridge.yaml'),
+            description='domain_bridge topic list.'),
+        DeclareLaunchArgument(
+            'use_stuck_monitor', default_value='true',
+            description='Detect getting stuck (driving but scan unchanged) and mark it for Nav2.'),
+        DeclareLaunchArgument(
+            'stuck_monitor_params_file', default_value=_share('config', 'stuck_monitor.yaml'),
+            description='stuck_monitor parameter file.'),
+        DeclareLaunchArgument(
             'explorer_start_delay_s', default_value='15.0',
             description='Delay before starting frontier_explorer so /map, TF and Nav2 are up.'),
     ]
@@ -125,6 +189,7 @@ def generate_launch_description():
         launch_arguments={
             'use_sim_time': use_sim_time,
             'scan_topic': LaunchConfiguration('scan_topic'),
+            'laser_yaw_fix': LaunchConfiguration('laser_yaw_fix'),
             'use_scan_filter': LaunchConfiguration('use_scan_filter'),
             'slam_params_file': LaunchConfiguration('slam_params_file'),
         }.items(),
@@ -136,6 +201,9 @@ def generate_launch_description():
             'use_sim_time': use_sim_time,
             'params_file': LaunchConfiguration('nav2_params_file'),
             'autostart': 'true',
+            'use_range_sensors': LaunchConfiguration('use_range_sensors'),
+            'range_cutoff': LaunchConfiguration('range_cutoff'),
+            'range_fov_scale': LaunchConfiguration('range_fov_scale'),
         }.items(),
     )
 
@@ -157,20 +225,34 @@ def generate_launch_description():
         ],
     )
 
+    stuck_monitor = Node(
+        package=PKG,
+        executable='stuck_monitor.py',
+        name='stuck_monitor',
+        output='screen',
+        parameters=[
+            LaunchConfiguration('stuck_monitor_params_file'),
+            {'use_sim_time': ParameterValue(use_sim_time, value_type=bool)},
+        ],
+        condition=IfCondition(LaunchConfiguration('use_stuck_monitor')),
+    )
+
     rviz = Node(
         package='rviz2',
         executable='rviz2',
         name='rviz2',
         output='log',
-        arguments=['-d', _share('rviz', 'exploration.rviz')],
+        arguments=['-d', LaunchConfiguration('rviz_config')],
         parameters=[{'use_sim_time': ParameterValue(use_sim_time, value_type=bool)}],
         condition=IfCondition(LaunchConfiguration('use_rviz')),
     )
 
     return LaunchDescription(declare_args + [
+        OpaqueFunction(function=_launch_bridge),
         slam,
         navigation,
         explorer,
+        stuck_monitor,
         OpaqueFunction(function=_launch_supervisor),
         rviz,
     ])

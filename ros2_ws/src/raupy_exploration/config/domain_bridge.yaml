@@ -1,0 +1,55 @@
+# domain_bridge config: the ONLY process that talks to Raupy over Wi-Fi.
+#
+# Why: with the whole stack on the robot's domain, every laptop process (13 of them subscribe
+# to /tf alone) is its own DDS participant, and the robot sends each one its own copy over
+# Wi-Fi, plus discovery traffic for hundreds of endpoints. That saturated the link
+# (robot TX 27 of ~39 Mbit/s) until TF and odometry stopped arriving.
+# With the bridge, every topic crosses the Wi-Fi exactly once; the stack runs on a private
+# laptop-only domain.
+#
+# from_domain = robot, to_domain = laptop stack. Both are overridden on the command line
+# (--from/--to) by exploration.launch.py, the values here are placeholders.
+name: raupy_bridge
+from_domain: 103
+to_domain: 57
+topics:
+  # --- robot -> laptop ---
+  # Sensor data: best effort, a late scan is worse than a lost one.
+  scan:
+    type: sensor_msgs/msg/LaserScan
+    qos:
+      reliability: best_effort
+      depth: 5
+  range/fl:
+    type: sensor_msgs/msg/LaserScan
+    qos: {reliability: best_effort, depth: 5}
+  range/fr:
+    type: sensor_msgs/msg/LaserScan
+    qos: {reliability: best_effort, depth: 5}
+  range/rl:
+    type: sensor_msgs/msg/LaserScan
+    qos: {reliability: best_effort, depth: 5}
+  range/rr:
+    type: sensor_msgs/msg/LaserScan
+    qos: {reliability: best_effort, depth: 5}
+  tf:
+    type: tf2_msgs/msg/TFMessage
+    qos: {reliability: reliable, durability: volatile, depth: 100}
+  # Latched. Several robot nodes may publish static transforms, so keep more than the
+  # last message for subscribers that start after the bridge.
+  tf_static:
+    type: tf2_msgs/msg/TFMessage
+    qos: {reliability: reliable, durability: transient_local, depth: 10}
+  odometry/filtered:
+    type: nav_msgs/msg/Odometry
+    qos: {reliability: reliable, depth: 10}
+  # For the RViz robot model.
+  robot_description:
+    type: std_msgs/msg/String
+    qos: {reliability: reliable, durability: transient_local, depth: 1}
+
+  # --- laptop -> robot ---
+  cmd_vel:
+    type: geometry_msgs/msg/TwistStamped
+    reversed: true
+    qos: {reliability: reliable, depth: 10}

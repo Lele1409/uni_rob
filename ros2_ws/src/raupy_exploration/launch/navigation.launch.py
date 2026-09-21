@@ -7,13 +7,18 @@ The final velocity output is /cmd_vel as geometry_msgs/TwistStamped
 
 The map_saver is separate because navigation_launch.py doesn't start one. The exploration
 supervisor calls /map_saver/save_map.
+
+range_relay feeds the robot's low ToF sensors (/range/*) into the costmaps' range_layer and
+the collision monitor, for obstacles below the lidar plane.
 """
 
 from launch import LaunchDescription
 from launch.actions import DeclareLaunchArgument, IncludeLaunchDescription
+from launch.conditions import IfCondition
 from launch.launch_description_sources import PythonLaunchDescriptionSource
 from launch.substitutions import LaunchConfiguration, PathJoinSubstitution
 from launch_ros.actions import Node
+from launch_ros.parameter_descriptions import ParameterValue
 from launch_ros.substitutions import FindPackageShare
 
 
@@ -44,6 +49,16 @@ def generate_launch_description():
         DeclareLaunchArgument(
             'log_level', default_value='info',
             description='ROS log level for all Nav2 nodes'),
+        DeclareLaunchArgument(
+            'use_range_sensors', default_value='true',
+            description='Relay the low ToF sensors /range/* into the costmaps and collision monitor'),
+        DeclareLaunchArgument(
+            'range_fov_scale', default_value='0.5',
+            description='Scale the ToF cone (driver: 15 deg) marked in the costmap; 0.5 = 7.5 deg.'),
+        DeclareLaunchArgument(
+            'range_cutoff', default_value='0.0',
+            description='Ignore ToF hits farther than this in m (0 = sensor max, 0.9 m). '
+                        'Lower it if the sensors see the floor.'),
     ]
 
     # Non-composed bringup: one process per server, easier to debug and to read logs.
@@ -84,4 +99,18 @@ def generate_launch_description():
         }],
     )
 
-    return LaunchDescription(declare_args + [nav2, map_saver, lifecycle_manager_map_saver])
+    range_relay = Node(
+        package='raupy_exploration',
+        executable='range_relay.py',
+        name='range_relay',
+        output='screen',
+        parameters=[{
+            'use_sim_time': use_sim_time,
+            'max_range_cutoff': ParameterValue(LaunchConfiguration('range_cutoff'), value_type=float),
+            'fov_scale': ParameterValue(LaunchConfiguration('range_fov_scale'), value_type=float),
+        }],
+        condition=IfCondition(LaunchConfiguration('use_range_sensors')),
+    )
+
+    return LaunchDescription(
+        declare_args + [nav2, map_saver, lifecycle_manager_map_saver, range_relay])
