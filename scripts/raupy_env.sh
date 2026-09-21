@@ -22,6 +22,16 @@ else
   export ROS_DOMAIN_ID="${ROS_DOMAIN_ID_FALLBACK:-103}"
   echo "raupy_env: robot not reachable, using ROS_DOMAIN_ID=$ROS_DOMAIN_ID (fallback)" >&2
 fi
+export RAUPY_ROBOT_DOMAIN="$ROS_DOMAIN_ID"
+# The exploration stack runs on its own laptop-only domain; domain_bridge is the only process
+# on the robot's domain (see ros2_ws/src/raupy_exploration/config/domain_bridge.yaml).
+export RAUPY_STACK_DOMAIN="${RAUPY_STACK_DOMAIN:-57}"
+# Switch this shell to the stack's domain (explore / stop / save_map scripts use it).
+raupy_use_stack_domain() {
+  export ROS_DOMAIN_ID="$RAUPY_STACK_DOMAIN"
+  export ROS_AUTOMATIC_DISCOVERY_RANGE=LOCALHOST
+  ros2 daemon stop >/dev/null 2>&1
+}
 ros2 daemon stop >/dev/null 2>&1
-echo "raupy_env: ROS_DOMAIN_ID=$ROS_DOMAIN_ID RMW=$RMW_IMPLEMENTATION"
+echo "raupy_env: ROS_DOMAIN_ID=$ROS_DOMAIN_ID (robot), stack domain $RAUPY_STACK_DOMAIN, RMW=$RMW_IMPLEMENTATION"
 unset _ws_root _domain
