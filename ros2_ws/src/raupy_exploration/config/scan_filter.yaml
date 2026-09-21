@@ -1,4 +1,5 @@
-# laser_filters scan_to_scan_filter_chain: removes chassis returns from Raupy's raw /scan.
+# laser_filters scan_to_scan_filter_chain: removes chassis returns and the blocked rear sector
+# from Raupy's raw /scan.
 #
 # The top-level key MUST equal the node name set in slam.launch.py ("scan_filter").
 # On the robot the YAML key ("laser_filter") did not match the node name
@@ -24,3 +25,18 @@ scan_filter:
         max_z: 0.25
         # false: remove points INSIDE the box (the chassis), keep everything else.
         invert: false
+    filter2:
+      name: rear_shadow
+      type: laser_filters/LaserScanAngularBoundsFilterInPlace
+      params:
+        # Something right next to the lidar (closer than its 5 cm minimum range) blocks the
+        # view straight back: measured 2026-09-21, base_link +150..-165 deg returned nothing
+        # 76-100 % of the time. Cut +145..-160 deg (5 deg margin).
+        # Angles are in the LIDAR's own frame, not base_link: the lidar is mounted at yaw
+        # 180 deg (see laser_yaw_fix in slam.launch.py), so base +145..+200 = laser -35..+20.
+        lower_angle: -0.611   # -35 deg
+        upper_angle: 0.349    # +20 deg
+        # NaN, not range_max + 1 (the default): the costmaps (inf_is_valid) and SLAM would
+        # treat "beyond max range" as free space and clear real obstacles behind the robot.
+        # NaN beams neither mark nor clear.
+        replace_with_nan: true
