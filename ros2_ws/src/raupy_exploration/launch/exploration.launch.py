@@ -11,7 +11,7 @@ The robot only runs its preinstalled services (driver, EKF, lidar); everything a
 
 On the real robot, use_bridge:=true robot_domain:=<id> starts domain_bridge (config/domain_bridge.yaml)
 and the stack itself must run on a separate, laptop-only ROS_DOMAIN_ID: then only the bridge
-talks to the robot over Wi-Fi. scripts/robot_explore.sh sets this up.
+talks to the robot over Wi-Fi. scripts/raupy_explore.sh sets this up.
 """
 
 import os
@@ -90,7 +90,7 @@ def _launch_bridge(context, *args, **kwargs):
     if robot_domain == stack_domain:
         raise RuntimeError(
             f'The stack runs on ROS_DOMAIN_ID={stack_domain}, the same as the robot. With the '
-            'bridge it must use its own domain (see scripts/robot_explore.sh).')
+            'bridge it must use its own domain (see scripts/raupy_explore.sh).')
     return [
         Node(
             package='domain_bridge',
@@ -127,7 +127,7 @@ def generate_launch_description():
             description='Start RViz with rviz/exploration.rviz.'),
         DeclareLaunchArgument(
             'rviz_config', default_value=_share('rviz', 'exploration.rviz'),
-            description='RViz layout (robot_explore.sh passes a copy with a lower frame rate).'),
+            description='RViz layout (raupy_explore.sh passes a copy with a lower frame rate).'),
         DeclareLaunchArgument(
             'explorer_params_file', default_value=_share('config', 'explorer_raupy.yaml'),
             description='frontier_explorer parameter file.'),

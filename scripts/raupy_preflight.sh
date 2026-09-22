@@ -1,22 +1,22 @@
 #!/bin/bash
-# robot_preflight.sh — run on the laptop before every exploration session.
-#   scripts/robot_preflight.sh
+# raupy_preflight.sh — run on the laptop before every exploration session.
+#   scripts/raupy_preflight.sh
 # 1. robot side (over SSH): microros/rosbot services, starts the lidar, clock offset
 # 2. laptop side: /scan, /odometry/filtered and TF odom->base_link actually arrive here
 # It does not move the robot.
 
 _ws_root="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
-source "$_ws_root/scripts/robot_env.sh" || exit 1
+source "$_ws_root/scripts/raupy_env.sh"
 
 ok()   { echo "  [ OK ] $*"; }
 warn() { echo "  [WARN] $*"; }
 fail() { echo "  [FAIL] $*"; FAILED=1; }
 FAILED=0
-SSH="ssh -o BatchMode=yes -o ConnectTimeout=5 $ROBOT_USER@$ROBOT_HOST"
+SSH="ssh -o BatchMode=yes -o ConnectTimeout=5 $RAUPY_USER@$RAUPY_HOST"
 
-echo "== Robot ($ROBOT_HOST)"
+echo "== Robot ($RAUPY_HOST)"
 if ! $SSH true 2>/dev/null; then
-  fail "SSH to $ROBOT_USER@$ROBOT_HOST failed"; exit 1
+  fail "SSH to $RAUPY_USER@$RAUPY_HOST failed"; exit 1
 fi
 for svc in microros rosbot; do
   state="$($SSH systemctl is-active "$svc" 2>/dev/null)"
@@ -35,7 +35,7 @@ echo "== Laptop"
 if ros2 pkg prefix laser_filters >/dev/null 2>&1; then
   ok "laser_filters installed (chassis box filter will be used)"
 else
-  warn "laser_filters missing: robot_explore.sh will relay /scan unfiltered."
+  warn "laser_filters missing: raupy_explore.sh will relay /scan unfiltered."
   warn "  install with: sudo apt install ros-jazzy-laser-filters"
 fi
 
@@ -98,7 +98,7 @@ fi
 
 echo
 if [ "$FAILED" = 0 ]; then
-  echo "Preflight passed. Next: scripts/robot_explore.sh"
+  echo "Preflight passed. Next: scripts/raupy_explore.sh"
 else
   echo "Preflight FAILED, fix the items above first."
   exit 1
