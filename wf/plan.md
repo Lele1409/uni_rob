@@ -33,7 +33,7 @@ ros2 launch raupy_exploration exploration.launch.py use_scan_filter:=false max_d
 Real robot (Phase 5):
 ```bash
 ssh husarion@raupy.roblab.cs.hs-fulda.de rosbot-lidar.sh start
-source scripts/raupy_env.sh
+source scripts/robot_env.sh
 ros2 launch raupy_exploration exploration.launch.py
 ```
 
@@ -138,7 +138,7 @@ rosdep install --from-paths ros2_ws/src --ignore-src -y     # after adding the s
       and pin it to the release tag/commit of v1.6.1. Don't fork, since we don't patch it.
 - [ ] Create package `raupy_exploration` (ament_cmake + Python node or C++):
       `config/ launch/ rviz/ scripts/ src/ maps/`.
-- [ ] `scripts/raupy_env.sh` (source it before every session):
+- [ ] `scripts/robot_env.sh` (source it before every session):
   - `source /opt/ros/jazzy/setup.bash` and the workspace overlay
   - `RMW_IMPLEMENTATION=rmw_fastrtps_cpp`, `FASTDDS_BUILTIN_TRANSPORTS=UDPv4`
   - `ROS_DOMAIN_ID` read live from the robot:
@@ -147,7 +147,7 @@ rosdep install --from-paths ros2_ws/src --ignore-src -y     # after adding the s
       (`colcon test --packages-select frontier_exploration_ros2`).
 
 **Done when:** the workspace builds cleanly, the tests pass, and
-`ros2 topic list` shows the robot topics after sourcing `raupy_env.sh`.
+`ros2 topic list` shows the robot topics after sourcing `robot_env.sh`.
 
 ### Phase 1 – Sensor pipeline + SLAM on the real robot (≈1 day, by 2026-09-18)
 - [ ] `config/scan_filter.yaml`: `laser_filters/LaserScanBoxFilter` in `base_link`, with the
@@ -327,7 +327,7 @@ One well-commented node in `raupy_exploration`.
 
 | Risk | Mitigation |
 |---|---|
-| Domain ID changes (new DHCP lease) → laptop sees nothing | `raupy_env.sh` reads it live from the robot every time |
+| Domain ID changes (new DHCP lease) → laptop sees nothing | `robot_env.sh` reads it live from the robot every time |
 | Wi-Fi latency or dropouts break TF / control | Generous `transform_tolerance`, low speeds, robot stops itself after 0.5 s. Fallback: SLAM on the robot (`rosbot-slam.sh`) |
 | Laptop CPU/RAM (4 cores, 3.8 GB) | `mrtsp_solver: greedy`, `map_processing_rate_hz: 0.5`, RViz on a second machine if needed |
 | Skid-steer odometry slips when turning | EKF uses IMU yaw; low `max_vel_theta`; `rotate_to_heading` at low speed |

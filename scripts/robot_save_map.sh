@@ -1,15 +1,15 @@
 #!/bin/bash
-# raupy_save_map.sh — save the current map while raupy_explore.sh is still running.
-#   scripts/raupy_save_map.sh [name]        # default name: raupy_map
+# robot_save_map.sh — save the current map while robot_explore.sh is still running.
+#   scripts/robot_save_map.sh [name]        # default name: <robot>_map (raupy_map / bisasam_map)
 # Writes ~/raupy_maps/<name>_<YYYYmmdd_HHMMSS>.{yaml,pgm} (Nav2 map, loadable by map_server)
 # and .{posegraph,data} (slam_toolbox pose graph, to continue mapping later).
 # Needs slam_toolbox and map_saver alive: run it BEFORE Ctrl+C on the launch.
 
 _ws_root="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
-source "$_ws_root/scripts/raupy_env.sh" >/dev/null
-raupy_use_stack_domain  # the stack runs on its own domain, behind domain_bridge
+source "$_ws_root/scripts/robot_env.sh" >/dev/null || exit 1
+use_stack_domain  # the stack runs on its own domain, behind domain_bridge
 
-name="${1:-raupy_map}"
+name="${1:-${ROBOT}_map}"
 dir="$HOME/raupy_maps"
 base="$dir/${name}_$(date +%Y%m%d_%H%M%S)"
 mkdir -p "$dir"
@@ -22,4 +22,4 @@ timeout 20 ros2 service call /map_saver/save_map nav2_msgs/srv/SaveMap \
 timeout 20 ros2 service call /slam_toolbox/serialize_map slam_toolbox/srv/SerializePoseGraph \
   "{filename: '$base'}" | tail -1
 
-ls -l "$base".* 2>/dev/null || { echo "raupy_save_map: no files written" >&2; exit 1; }
+ls -l "$base".* 2>/dev/null || { echo "robot_save_map: no files written" >&2; exit 1; }
