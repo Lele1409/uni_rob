@@ -1,4 +1,4 @@
-# domain_bridge config: the ONLY process that talks to Raupy over Wi-Fi.
+# domain_bridge config: the ONLY process that talks to Bisasam over Wi-Fi.
 #
 # Why: with the whole stack on the robot's domain, every laptop process (13 of them subscribe
 # to /tf alone) is its own DDS participant, and the robot sends each one its own copy over
@@ -7,10 +7,23 @@
 # With the bridge, every topic crosses the Wi-Fi exactly once; the stack runs on a private
 # laptop-only domain.
 #
+# On Bisasam the bridge does a second job: domain 30 is shared with another group, so this is
+# also the only process that has to tolerate their nodes' traffic and discovery.
+#
+# BISASAM BRANCH. Two differences from Raupy:
+#   - cmd_vel is a plain geometry_msgs/Twist. The type here must match the robot exactly;
+#     a mismatch shows up as a bridge that starts fine and simply never delivers anything.
+#   - no /range/* ToF topics exist, so they are not bridged.
+#
+# Bisasam runs Humble and the laptop runs Jazzy. The message definitions used here are
+# unchanged between the two distros, so the bridge works, but it is the one place where a
+# cross-distro mismatch would appear first. scripts/raupy_check_interfaces.sh verifies the
+# types on the robot's domain before a run.
+#
 # from_domain = robot, to_domain = laptop stack. Both are overridden on the command line
 # (--from/--to) by exploration.launch.py, the values here are placeholders.
 name: raupy_bridge
-from_domain: 103
+from_domain: 30
 to_domain: 57
 topics:
   # --- robot -> laptop ---
@@ -20,18 +33,6 @@ topics:
     qos:
       reliability: best_effort
       depth: 5
-  range/fl:
-    type: sensor_msgs/msg/LaserScan
-    qos: {reliability: best_effort, depth: 5}
-  range/fr:
-    type: sensor_msgs/msg/LaserScan
-    qos: {reliability: best_effort, depth: 5}
-  range/rl:
-    type: sensor_msgs/msg/LaserScan
-    qos: {reliability: best_effort, depth: 5}
-  range/rr:
-    type: sensor_msgs/msg/LaserScan
-    qos: {reliability: best_effort, depth: 5}
   tf:
     type: tf2_msgs/msg/TFMessage
     qos: {reliability: reliable, durability: volatile, depth: 100}
@@ -50,6 +51,6 @@ topics:
 
   # --- laptop -> robot ---
   cmd_vel:
-    type: geometry_msgs/msg/TwistStamped
+    type: geometry_msgs/msg/Twist
     reversed: true
     qos: {reliability: reliable, depth: 10}

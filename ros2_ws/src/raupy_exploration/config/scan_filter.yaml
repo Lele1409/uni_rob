@@ -1,10 +1,14 @@
 # laser_filters scan_to_scan_filter_chain: removes chassis returns and the blocked rear sector
-# from Raupy's raw /scan.
+# from the robot's raw /scan.
 #
 # The top-level key MUST equal the node name set in slam.launch.py ("scan_filter").
-# On the robot the YAML key ("laser_filter") did not match the node name
+# On Raupy the robot's own YAML key ("laser_filter") did not match its node name
 # ("laser_filters"), so the node started with an empty chain; that is the likely
 # reason its /scan_filtered stayed silent. Parameters under a wrong key are simply ignored.
+#
+# BISASAM BRANCH. Both filters carry over from Raupy unchanged: they describe the ROSbot 2 PRO
+# body, not the ROS stack. The one thing to check is the lidar mounting yaw the robot's URDF
+# publishes, because filter2's angles are in the lidar frame (see its comment).
 scan_filter:
   ros__parameters:
     filter1:
@@ -12,8 +16,7 @@ scan_filter:
       type: laser_filters/LaserScanBoxFilter
       params:
         # Box is defined in base_link so it moves with the robot, independent of the
-        # lidar mount (base_link -> laser is xyz 0.020/0/0.131, yaw -90 deg).
-        # Robot's own rosbot_utils box: x -0.17..0.10, y +-0.12, z 0..0.2.
+        # lidar mount. Husarion's own rosbot_utils box: x -0.17..0.10, y +-0.12, z 0..0.2.
         # We add ~2 cm margin (5 cm in z) so cables/cover edges never leak into the map.
         box_frame: base_link
         min_x: -0.19
@@ -29,11 +32,14 @@ scan_filter:
       name: rear_shadow
       type: laser_filters/LaserScanAngularBoundsFilterInPlace
       params:
-        # Something right next to the lidar (closer than its 5 cm minimum range) blocks the
-        # view straight back: measured 2026-09-21, base_link +150..-165 deg returned nothing
-        # 76-100 % of the time. Cut +145..-160 deg (5 deg margin).
-        # Angles are in the LIDAR's own frame, not base_link: the lidar is mounted at yaw
-        # 180 deg (see laser_yaw_fix in slam.launch.py), so base +145..+200 = laser -35..+20.
+        # The Wi-Fi antennas sit right behind the lidar, closer than its 5 cm minimum range,
+        # and block the view straight back: measured on Raupy 2026-09-21, base_link
+        # +150..-165 deg returned nothing 76-100 % of the time. Every ROSbot 2 PRO has those
+        # antennas, so Bisasam keeps the same cut: +145..-160 deg (5 deg margin).
+        # Angles are in the LIDAR's own frame, not base_link: with the lidar at yaw 180 deg,
+        # base +145..+200 = laser -35..+20. If Bisasam's URDF publishes a different lidar yaw
+        # than 180 deg (check with scripts/raupy_check_interfaces.sh), shift both values by
+        # the difference, or line the frames up with slam.launch.py's laser_yaw_fix instead.
         lower_angle: -0.611   # -35 deg
         upper_angle: 0.349    # +20 deg
         # NaN, not range_max + 1 (the default): the costmaps (inf_is_valid) and SLAM would

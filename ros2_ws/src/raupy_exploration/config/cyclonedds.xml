@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!--
+  CycloneDDS settings for the laptop side, pointed at by CYCLONEDDS_URI in scripts/raupy_env.sh.
+
+  Bisasam's Humble containers use rmw_cyclonedds_cpp, and DDS only talks to the same
+  implementation, so the laptop has to use Cyclone as well (Raupy used Fast DDS).
+
+  Why the file is needed at all: Cyclone picks exactly ONE network interface by default,
+  and it picks it per process. Our run needs two at once, in the domain_bridge process:
+  the Wi-Fi interface for the robot's domain, and loopback for the laptop-only stack domain.
+  Left to the default, whichever one Cyclone picks first silently kills the other half of
+  the run: typically the bridge sees the robot, but the stack never sees the bridge.
+
+  "any" applies to every domain id, so one file covers both the robot and the stack domain.
+-->
+<CycloneDDS xmlns="https://cdds.io/config"
+            xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+            xsi:schemaLocation="https://cdds.io/config
+                                https://raw.githubusercontent.com/eclipse-cyclonedds/cyclonedds/master/etc/cyclonedds.xsd">
+  <Domain id="any">
+    <General>
+      <Interfaces>
+        <!-- The real network interface, whichever one has a usable route (Wi-Fi here). -->
+        <NetworkInterface autodetermine="true" priority="default" multicast="default"/>
+        <!-- Loopback, explicitly with multicast: the stack domain lives entirely on this
+             machine and its participants have to discover each other over it. -->
+        <NetworkInterface name="lo" priority="default" multicast="true"/>
+      </Interfaces>
+      <AllowMulticast>default</AllowMulticast>
+    </General>
+  </Domain>
+</CycloneDDS>

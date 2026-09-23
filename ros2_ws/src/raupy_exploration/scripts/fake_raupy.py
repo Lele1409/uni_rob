@@ -1,11 +1,13 @@
 #!/usr/bin/env python3
-"""Minimal stand-in for the real Raupy robot, for testing the laptop stack offline.
+"""Minimal stand-in for the real robot, for testing the laptop stack offline.
 
 It reproduces exactly the interfaces the real ROSbot 2 PRO exposes (see wf/plan.md, section 2),
 so exploration.launch.py can run unchanged without hardware:
 
-  * subscribes /cmd_vel as geometry_msgs/TwistStamped (plain Twist is ignored on the robot too)
-    and stops after 0.5 s without commands, like the robot's cmd_vel_timeout
+  * subscribes /cmd_vel and stops after 0.5 s without commands, like the robot's
+    cmd_vel_timeout. The message type follows the cmd_vel_stamped parameter, default false
+    for Bisasam (Raupy: true). Getting it wrong is the failure this branch has to rehearse:
+    the wrong type is not an error anywhere, the fake robot simply never moves
   * publishes /odometry/filtered and TF odom -> base_link (the robot's EKF output)
   * publishes static TF base_link -> laser with the real mount: xyz (0.02, 0, 0.131), yaw -90 deg
   * publishes /scan in frame `laser`: 360 deg, best-effort sensor QoS, 10 Hz, ray-cast in a
@@ -19,12 +21,14 @@ import math
 
 import numpy as np
 import rclpy
-from geometry_msgs.msg import TransformStamped, TwistStamped
+from geometry_msgs.msg import TransformStamped
 from nav_msgs.msg import Odometry
 from rclpy.node import Node
 from rclpy.qos import qos_profile_sensor_data
 from sensor_msgs.msg import LaserScan
 from tf2_ros import StaticTransformBroadcaster, TransformBroadcaster
+
+from raupy_exploration.cmd_vel_util import cmd_vel_twist, cmd_vel_type
 
 RES = 0.05  # floor plan resolution [m/cell]
 
@@ -59,6 +63,7 @@ class FakeRaupy(Node):
         self.declare_parameter('start_y', 1.5)
         self.declare_parameter('beams', 720)       # real A3 has 1800; fewer keeps CPU low
         self.declare_parameter('range_max', 12.0)
+        self.declare_parameter('cmd_vel_stamped', False)
         self.x = self.get_parameter('start_x').value
         self.y = self.get_parameter('start_y').value
         self.th = 0.0
@@ -67,17 +72,20 @@ class FakeRaupy(Node):
         self.world = build_world()
         self.beams = int(self.get_parameter('beams').value)
         self.range_max = float(self.get_parameter('range_max').value)
+        stamped = bool(self.get_parameter('cmd_vel_stamped').value)
 
         self.tf = TransformBroadcaster(self)
         self.static_tf = StaticTransformBroadcaster(self)
         self.odom_pub = self.create_publisher(Odometry, '/odometry/filtered', 10)
         self.scan_pub = self.create_publisher(LaserScan, '/scan', qos_profile_sensor_data)
-        self.create_subscription(TwistStamped, '/cmd_vel', self.on_cmd, 10)
+        self.create_subscription(cmd_vel_type(stamped), '/cmd_vel', self.on_cmd, 10)
         self._publish_laser_mount()
         self.dt = 0.05
         self.create_timer(self.dt, self.step)      # 20 Hz odometry, like the robot
         self.create_timer(0.1, self.publish_scan)  # 10 Hz scan
-        self.get_logger().info('fake_raupy up: TwistStamped /cmd_vel -> /odometry/filtered, /scan')
+        self.get_logger().info(
+            f'fake_raupy up: {cmd_vel_type(stamped).__name__} /cmd_vel'
+            ' -> /odometry/filtered, /scan')
 
     def _publish_laser_mount(self):
         t = TransformStamped()
@@ -89,8 +97,9 @@ class FakeRaupy(Node):
         self.static_tf.sendTransform(t)
 
     def on_cmd(self, msg):
-        self.v = max(-1.0, min(1.0, msg.twist.linear.x))
-        self.w = max(-3.14, min(3.14, msg.twist.angular.z))
+        twist = cmd_vel_twist(msg)
+        self.v = max(-1.0, min(1.0, twist.linear.x))
+        self.w = max(-3.14, min(3.14, twist.angular.z))
         self.last_cmd = self.get_clock().now()
 
     def occupied(self, x, y):

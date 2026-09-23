@@ -1,6 +1,6 @@
 #!/bin/bash
 # raupy_save_map.sh — save the current map while raupy_explore.sh is still running.
-#   scripts/raupy_save_map.sh [name]        # default name: raupy_map
+#   scripts/raupy_save_map.sh [name]        # default name: bisasam_map
 # Writes ~/raupy_maps/<name>_<YYYYmmdd_HHMMSS>.{yaml,pgm} (Nav2 map, loadable by map_server)
 # and .{posegraph,data} (slam_toolbox pose graph, to continue mapping later).
 # Needs slam_toolbox and map_saver alive: run it BEFORE Ctrl+C on the launch.
@@ -9,7 +9,7 @@ _ws_root="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 source "$_ws_root/scripts/raupy_env.sh" >/dev/null
 raupy_use_stack_domain  # the stack runs on its own domain, behind domain_bridge
 
-name="${1:-raupy_map}"
+name="${1:-bisasam_map}"
 dir="$HOME/raupy_maps"
 base="$dir/${name}_$(date +%Y%m%d_%H%M%S)"
 mkdir -p "$dir"

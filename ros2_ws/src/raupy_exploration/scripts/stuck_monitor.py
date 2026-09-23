@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Detect Raupy getting stuck, mark what it got stuck on, and get it free again.
+"""Detect the robot getting stuck, mark what it got stuck on, and get it free again.
 
 Two triggers (logic in raupy_exploration.stuck_logic):
 
@@ -22,7 +22,10 @@ its collision check, and that check is exactly what fails when the robot is alre
 collision"; the collision monitor would likewise block moving away from an obstacle inside
 the footprint. Instead the escape is guarded here: the ToF sensors on that side and the lidar
 points in the strip the robot would sweep must be clear, before and during the move, and it
-is limited by distance (odometry) and time.
+is limited by distance (odometry) and time. Bisasam's stack publishes no ToF topics, so
+there ``use_range_sensors: false`` leaves only the lidar guard -- which is blind to anything
+below the lidar plane, the very obstacles the robot gets stuck on. Keep escape_distance
+short and stay next to the robot.
 
 The explorer is only resumed if the supervisor hasn't ended the run (latched
 /exploration_stopped). `ros2 service call /stuck_monitor/clear std_srvs/srv/Empty` removes
@@ -34,7 +37,6 @@ import math
 
 from action_msgs.msg import GoalStatus, GoalStatusArray
 from action_msgs.srv import CancelGoal
-from geometry_msgs.msg import TwistStamped
 from nav2_msgs.srv import ClearEntireCostmap
 import numpy as np
 import rclpy
@@ -49,6 +51,7 @@ from std_msgs.msg import Float32, Header
 from std_srvs.srv import Empty
 from tf2_ros import Buffer, TransformException, TransformListener
 
+from raupy_exploration.cmd_vel_util import cmd_vel_twist, cmd_vel_type, make_cmd_vel
 from raupy_exploration.stuck_logic import (
     corridor_blocked,
     NoProgressDetector,
@@ -94,6 +97,10 @@ class StuckMonitor(Node):
         self.map_frame = p('map_frame', 'map').value
         self.odom_frame = p('odom_frame', 'odom').value
         self.base_frame = p('base_frame', 'base_link').value
+        # Bisasam's Humble stack takes a plain Twist; Raupy's Jazzy stack a TwistStamped.
+        self.cmd_vel_stamped = p('cmd_vel_stamped', False).value
+        # Bisasam publishes no /range/* ToF topics, so the escape is lidar-guarded only.
+        self.use_range_sensors = p('use_range_sensors', False).value
 
         self.rescue_enabled = p('rescue_enabled', True).value
         self.no_progress = NoProgressDetector(
@@ -127,21 +134,24 @@ class StuckMonitor(Node):
         self.tf_buffer = Buffer()
         self.tf_listener = TransformListener(self.tf_buffer, self)
 
-        self.create_subscription(TwistStamped, '/cmd_vel', self._on_cmd, 10)
+        self.create_subscription(
+            cmd_vel_type(self.cmd_vel_stamped), '/cmd_vel', self._on_cmd, 10)
         self.create_subscription(LaserScan, '/scan_clean', self._on_scan, qos_profile_sensor_data)
         self.create_subscription(
             GoalStatusArray, navigate_action + '/_action/status',
             self._on_nav_status, 10)
         self.create_subscription(
             EmptyMsg, '/exploration_stopped', self._on_run_over, LATCHED_QOS)
-        for side in ('fl', 'fr', 'rl', 'rr'):
-            self.create_subscription(
-                LaserScan, f'/range/{side}',
-                lambda msg, s=side: self.tof.__setitem__(s, list(msg.ranges)),
-                qos_profile_sensor_data)
+        if self.use_range_sensors:
+            for side in ('fl', 'fr', 'rl', 'rr'):
+                self.create_subscription(
+                    LaserScan, f'/range/{side}',
+                    lambda msg, s=side: self.tof.__setitem__(s, list(msg.ranges)),
+                    qos_profile_sensor_data)
         self.cloud_pub = self.create_publisher(PointCloud2, '/stuck_obstacles', 10)
         self.change_pub = self.create_publisher(Float32, '~/scan_change', 10)
-        self.cmd_pub = self.create_publisher(TwistStamped, '/cmd_vel', 10)
+        self.cmd_pub = self.create_publisher(
+            cmd_vel_type(self.cmd_vel_stamped), '/cmd_vel', 10)
         self.create_service(Empty, '~/clear', self._on_clear)
         self.costmap_clearers = [
             self.create_client(ClearEntireCostmap, name) for name in (
@@ -167,7 +177,7 @@ class StuckMonitor(Node):
         return self.get_clock().now().nanoseconds * 1e-9
 
     def _on_cmd(self, msg):
-        self.last_cmd_v = msg.twist.linear.x
+        self.last_cmd_v = cmd_vel_twist(msg).linear.x
         self.last_cmd_time = self._now()
 
     def _on_scan(self, msg):
@@ -336,7 +346,9 @@ class StuckMonitor(Node):
         sensors = ('fl', 'fr') if direction > 0 else ('rl', 'rr')
         # ToF sensors sit (edge - tof_x) inside the chassis edge.
         needed = remaining + self.escape_clearance + (edge - self.tof_x)
-        tof_ok = all(range_clear(self.tof.get(s, []), needed) for s in sensors)
+        # Without ToF topics (Bisasam) the lidar corridor check below is the only guard.
+        tof_ok = (not self.use_range_sensors
+                  or all(range_clear(self.tof.get(s, []), needed) for s in sensors))
         lidar_blocked = corridor_blocked(
             self._scan_points_base(), direction, edge,
             remaining + self.escape_clearance, self.chassis_half_width)
@@ -381,11 +393,9 @@ class StuckMonitor(Node):
         self.no_progress.reset(t)
 
     def _publish_speed(self, v):
-        msg = TwistStamped()
-        msg.header.stamp = self.get_clock().now().to_msg()
-        msg.header.frame_id = self.base_frame
-        msg.twist.linear.x = v
-        self.cmd_pub.publish(msg)
+        self.cmd_pub.publish(make_cmd_vel(
+            self.cmd_vel_stamped, linear_x=v,
+            stamp=self.get_clock().now().to_msg(), frame_id=self.base_frame))
 
     # --- virtual obstacles ----------------------------------------------------------------
 

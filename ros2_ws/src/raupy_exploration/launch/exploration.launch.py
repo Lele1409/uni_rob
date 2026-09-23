@@ -1,17 +1,21 @@
-"""One-command laptop bringup for autonomous exploration on Raupy.
+"""One-command laptop bringup for autonomous exploration on Bisasam.
 
     slam.launch.py        scan filter (/scan -> /scan_clean) + slam_toolbox (/map, TF map->odom)
-    navigation.launch.py  Nav2 (navigate_to_pose, costmaps) + map_saver + range_relay
+    navigation.launch.py  Nav2 (navigate_to_pose, costmaps) + map_saver
     frontier_explorer     library node, started after explorer_start_delay_s
     exploration_supervisor  stops exploration (complete / timeout / stagnation) and saves the map
     stuck_monitor         marks spots where the robot got stuck on unseen obstacles
     rviz2                 optional
 
-The robot only runs its preinstalled services (driver, EKF, lidar); everything above runs here.
+The robot only runs its preinstalled stack (driver, EKF, lidar); everything above runs here.
+Bisasam runs that stack as Humble containers with CycloneDDS, so the laptop must use
+rmw_cyclonedds_cpp as well (scripts/raupy_env.sh sets it). Its ToF sensors are not
+published, hence use_range_sensors defaults to false here.
 
 On the real robot, use_bridge:=true robot_domain:=<id> starts domain_bridge (config/domain_bridge.yaml)
 and the stack itself must run on a separate, laptop-only ROS_DOMAIN_ID: then only the bridge
-talks to the robot over Wi-Fi. scripts/raupy_explore.sh sets this up.
+talks to the robot over Wi-Fi. That matters twice on Bisasam, whose domain 30 is shared with
+another group. scripts/raupy_explore.sh sets this up.
 """
 
 import os
@@ -118,7 +122,8 @@ def generate_launch_description():
             description='Raw LaserScan topic from the robot.'),
         DeclareLaunchArgument(
             'laser_yaw_fix', default_value='',
-            description="Override the robot URDF's lidar yaw in rad (Raupy: 3.14159). Empty = trust the robot."),
+            description="Override the robot URDF's lidar yaw in rad. Raupy needed 3.14159; on "
+                        "Bisasam the default is empty (trust its URDF) until measured."),
         DeclareLaunchArgument(
             'use_scan_filter', default_value='true',
             description='Filter chassis returns (scan_topic -> /scan_clean) before SLAM.'),
@@ -150,14 +155,15 @@ def generate_launch_description():
             'min_new_area_m2', default_value='0.5',
             description='Supervisor: minimum new known area per stagnation window.'),
         DeclareLaunchArgument(
-            'map_name', default_value='raupy_map',
+            'map_name', default_value='bisasam_map',
             description='Supervisor: base file name of the saved map.'),
         DeclareLaunchArgument(
             'map_output_dir', default_value='',
             description='Supervisor: output directory for the map (empty = supervisor default).'),
         DeclareLaunchArgument(
-            'use_range_sensors', default_value='true',
-            description='Use the low ToF sensors (/range/*) for obstacles below the lidar.'),
+            'use_range_sensors', default_value='false',
+            description='Use the low ToF sensors (/range/*) for obstacles below the lidar. '
+                        'False on Bisasam: its stack does not publish them.'),
         DeclareLaunchArgument(
             'range_fov_scale', default_value='0.5',
             description='Scale the ToF cone (driver: 15 deg) marked in the costmap; 0.5 = 7.5 deg.'),

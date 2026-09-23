@@ -1,7 +1,7 @@
-"""Nav2 for Raupy: nav2_bringup navigation_launch.py plus a standalone map_saver.
+"""Nav2 for Bisasam: nav2_bringup navigation_launch.py plus a standalone map_saver.
 
 No AMCL and no map_server. slam_toolbox provides /map and map->odom.
-The final velocity output is /cmd_vel as geometry_msgs/TwistStamped
+The final velocity output is /cmd_vel as a plain geometry_msgs/Twist
 (controller -> cmd_vel_nav -> velocity_smoother -> cmd_vel_smoothed
 -> collision_monitor -> cmd_vel). See config/nav2_raupy.yaml.
 
@@ -9,7 +9,8 @@ The map_saver is separate because navigation_launch.py doesn't start one. The ex
 supervisor calls /map_saver/save_map.
 
 range_relay feeds the robot's low ToF sensors (/range/*) into the costmaps' range_layer and
-the collision monitor, for obstacles below the lidar plane.
+the collision monitor, for obstacles below the lidar plane. Bisasam does not publish those
+topics, so use_range_sensors defaults to false and the relay is not started.
 """
 
 from launch import LaunchDescription
@@ -50,8 +51,9 @@ def generate_launch_description():
             'log_level', default_value='info',
             description='ROS log level for all Nav2 nodes'),
         DeclareLaunchArgument(
-            'use_range_sensors', default_value='true',
-            description='Relay the low ToF sensors /range/* into the costmaps and collision monitor'),
+            'use_range_sensors', default_value='false',
+            description='Relay the low ToF sensors /range/* into the costmaps and collision '
+                        'monitor. False on Bisasam: its stack does not publish them.'),
         DeclareLaunchArgument(
             'range_fov_scale', default_value='0.5',
             description='Scale the ToF cone (driver: 15 deg) marked in the costmap; 0.5 = 7.5 deg.'),

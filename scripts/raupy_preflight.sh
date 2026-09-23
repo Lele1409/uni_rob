@@ -1,9 +1,17 @@
 #!/bin/bash
 # raupy_preflight.sh — run on the laptop before every exploration session.
 #   scripts/raupy_preflight.sh
-# 1. robot side (over SSH): microros/rosbot services, starts the lidar, clock offset
+# 1. robot side (over SSH): the stack's containers are up, and nothing is obviously wedged
 # 2. laptop side: /scan, /odometry/filtered and TF odom->base_link actually arrive here
 # It does not move the robot.
+#
+# BISASAM BRANCH. Bisasam runs its stack as Docker containers, not as the microros/rosbot
+# systemd units Raupy used, and it has no rplidar.service to start -- its lidar container
+# comes up with the rest. The robot-side checks are therefore best-effort and never fatal on
+# their own: what counts is whether the data arrives, which the laptop-side checks measure.
+#
+# Run scripts/raupy_check_interfaces.sh once before the first session of the day; it verifies
+# the topic names, types and frames that this preflight takes for granted.
 
 _ws_root="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 source "$_ws_root/scripts/raupy_env.sh"
@@ -16,22 +24,33 @@ SSH="ssh -o BatchMode=yes -o ConnectTimeout=5 $RAUPY_USER@$RAUPY_HOST"
 
 echo "== Robot ($RAUPY_HOST)"
 if ! $SSH true 2>/dev/null; then
-  fail "SSH to $RAUPY_USER@$RAUPY_HOST failed"; exit 1
-fi
-for svc in microros rosbot; do
-  state="$($SSH systemctl is-active "$svc" 2>/dev/null)"
-  [ "$state" = active ] && ok "$svc.service active" || fail "$svc.service is '$state'"
-done
-
-# The lidar is off by default (rplidar.service, started via rosbot-lidar.sh).
-if $SSH 'systemctl is-active --quiet rplidar' 2>/dev/null; then
-  ok "lidar already running"
+  warn "SSH to $RAUPY_USER@$RAUPY_HOST failed, skipping the robot-side checks."
+  warn "  The laptop-side checks below are what actually decide whether a run can start."
 else
-  echo "  starting lidar ..."
-  $SSH 'rosbot-lidar.sh start' && ok "lidar started" || fail "rosbot-lidar.sh start failed"
+  # Bisasam is shared with another group, so report what is running rather than insisting
+  # on a fixed set of container names.
+  running="$($SSH 'docker ps --format "{{.Names}}\t{{.Status}}"' 2>/dev/null)"
+  if [ -z "$running" ]; then
+    fail "no containers are running (or $RAUPY_USER cannot reach docker)."
+    fail "  Bring the stack up on the robot before starting here."
+  else
+    ok "$(echo "$running" | wc -l) container(s) running:"
+    echo "$running" | sed 's/^/         /'
+    # A container that keeps restarting looks "up" in a casual glance but delivers nothing.
+    if echo "$running" | grep -qi 'restarting'; then
+      fail "at least one container is restarting in a loop, see above."
+    fi
+  fi
 fi
 
 echo "== Laptop"
+if ros2 pkg prefix rmw_cyclonedds_cpp >/dev/null 2>&1; then
+  ok "rmw_cyclonedds_cpp installed (matches Bisasam's DDS)"
+else
+  fail "rmw_cyclonedds_cpp missing: sudo apt install ros-jazzy-rmw-cyclonedds-cpp"
+  fail "  Without it the laptop sees an empty topic list, not an error."
+fi
+
 if ros2 pkg prefix laser_filters >/dev/null 2>&1; then
   ok "laser_filters installed (chassis box filter will be used)"
 else
@@ -96,11 +115,12 @@ else
   fail "TF odom -> base_link not received"
 fi
 
-# The MCU can come up half dead: ros2_control activates, topics flow, but the firmware
-# repeats one frozen sample forever (seen 2026-09-22: identical IMU quaternion/acceleration,
+# The MCU can come up half dead: the driver activates, topics flow, but the firmware repeats
+# one frozen sample forever (seen on Raupy 2026-09-22: identical IMU quaternion/acceleration,
 # encoders stuck, motors silent). The EKF then diverges on those constant inputs and invents
-# motion, so the map drifts away mid-run. A live IMU always jitters, so identical samples
-# are a reliable giveaway.
+# motion, so the map drifts away mid-run. A live IMU always jitters, so identical samples are
+# a reliable giveaway. Same CORE2 board on Bisasam, so the same failure is possible; its stack
+# may publish the IMU elsewhere, hence "no data" is only a warning here.
 imu=$(timeout 20 python3 - <<'EOF' 2>/dev/null
 import rclpy
 from sensor_msgs.msg import Imu
@@ -116,7 +136,8 @@ EOF
 )
 read -r n_imu n_uniq <<< "${imu:-0 0}"
 if [ "${n_imu:-0}" -lt 10 ]; then
-  fail "IMU: no /imu/data (the driver is not publishing)"
+  warn "IMU: no /imu/data. Check the topic name with scripts/raupy_check_interfaces.sh;"
+  warn "  until then a frozen MCU would only show up in raupy_drive_test.sh."
 elif [ "${n_uniq:-0}" -le 1 ]; then
   fail "IMU frozen: $n_imu identical samples. The MCU is half dead (encoders and motors too)."
   fail "  Power-cycle the robot, then check with scripts/raupy_drive_test.sh."
@@ -126,7 +147,7 @@ fi
 
 echo
 if [ "$FAILED" = 0 ]; then
-  echo "Preflight passed. Next: scripts/raupy_explore.sh"
+  echo "Preflight passed. Next: scripts/raupy_drive_test.sh, then scripts/raupy_explore.sh"
 else
   echo "Preflight FAILED, fix the items above first."
   exit 1

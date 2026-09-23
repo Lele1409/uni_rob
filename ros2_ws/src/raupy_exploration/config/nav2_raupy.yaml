@@ -1,12 +1,20 @@
-# Nav2 parameters for Raupy (Husarion ROSbot 2 PRO), ROS 2 Jazzy / Nav2 1.3.x.
+# Nav2 parameters for Bisasam (Husarion ROSbot 2 PRO), Nav2 1.3.x on the laptop's ROS 2 Jazzy.
+#
+# BISASAM BRANCH. Same chassis as Raupy, but its own ROS stack: a Humble Docker image with
+# CycloneDDS. Only the robot-facing assumptions differ from the wf-materials branch; the
+# tuning below was measured on Raupy and carries over, because the hardware is identical.
 #
 # Based on nav2_bringup/params/nav2_params.yaml and the robot's ~/Nav2/nav2_params_raupy.yaml,
 # with the values from wf/plan.md (Phase 2). Setup this file assumes:
 #   - slam_toolbox on the laptop provides /map and map->odom, so no amcl and no map_server here
 #   - the robot EKF provides odom->base_link and /odometry/filtered over Wi-Fi. TF is late,
 #     so transform tolerances are generous
-#   - the robot only accepts geometry_msgs/TwistStamped on /cmd_vel, so every node that
-#     publishes or relays velocities has enable_stamped_cmd_vel: true
+#   - the robot accepts a plain geometry_msgs/Twist on /cmd_vel, so every node that publishes
+#     or relays velocities has enable_stamped_cmd_vel: FALSE. A TwistStamped would be a
+#     different topic type and never reach the robot at all
+#   - Bisasam publishes no /range/* ToF topics, so range_layer is out of both costmaps'
+#     plugin lists and out of the collision monitor. The blocks are kept below (unused) so
+#     the difference stays visible and the layer can be switched back on if the topics appear
 #   - the costmaps use the laptop-side box-filtered scan /scan_clean
 #
 # use_sim_time is deliberately NOT set here. navigation_launch.py applies it via SetParameter
@@ -14,7 +22,7 @@
 #
 # Velocity chain (Jazzy navigation_launch.py remappings):
 #   controller_server / behavior_server -> cmd_vel_nav -> velocity_smoother
-#   -> cmd_vel_smoothed -> collision_monitor -> /cmd_vel (TwistStamped) -> robot
+#   -> cmd_vel_smoothed -> collision_monitor -> /cmd_vel (Twist) -> robot
 
 bt_navigator:
   ros__parameters:
@@ -38,7 +46,7 @@ bt_navigator:
 
 controller_server:
   ros__parameters:
-    enable_stamped_cmd_vel: true
+    enable_stamped_cmd_vel: false
     controller_frequency: 20.0
     # Robot speed for the progress/goal checkers comes from the EKF output.
     odom_topic: /odometry/filtered
@@ -121,9 +129,9 @@ local_costmap:
       # robot got stuck turning 21 cm from a wall, while the circle (centre cost only) made it.
       # Nav2 adds footprint_padding (default 0.01) on top.
       robot_radius: 0.17
-      # 2D lidar in a plain ObstacleLayer (no voxel layer), low ToF sensors in range_layer,
-      # virtual obstacles from stuck_monitor in stuck_layer.
-      plugins: ["obstacle_layer", "range_layer", "stuck_layer", "inflation_layer"]
+      # 2D lidar in a plain ObstacleLayer (no voxel layer) and virtual obstacles from
+      # stuck_monitor in stuck_layer. No range_layer: Bisasam has no ToF topics.
+      plugins: ["obstacle_layer", "stuck_layer", "inflation_layer"]
       obstacle_layer:
         plugin: "nav2_costmap_2d::ObstacleLayer"
         enabled: true
@@ -142,9 +150,11 @@ local_costmap:
           obstacle_min_range: 0.0
           # Clear rays that return inf/max range too, so free space gets cleared in open areas.
           inf_is_valid: true
-      # Low obstacles below the 13 cm lidar plane, from the 4 ToF sensors at ~5.5 cm
-      # (front/rear corners, 15 deg cone, 0.9 m) via range_relay.py. Own layer on purpose:
-      # in obstacle_layer the lidar's clearing rays would erase these marks every scan.
+      # UNUSED on Bisasam: not in the plugins list above, because its stack publishes no
+      # /range/* ToF topics. Kept for Raupy, where these are low obstacles below the 13 cm
+      # lidar plane, from the 4 ToF sensors at ~5.5 cm (front/rear corners, 15 deg cone,
+      # 0.9 m) via range_relay.py. Own layer on purpose: in obstacle_layer the lidar's
+      # clearing rays would erase these marks every scan.
       range_layer:
         plugin: "nav2_costmap_2d::RangeSensorLayer"
         enabled: true
@@ -204,7 +214,7 @@ global_costmap:
       resolution: 0.05
       # Keep unknown cells unknown so NavFn (allow_unknown) can plan to frontier edges.
       track_unknown_space: true
-      plugins: ["static_layer", "obstacle_layer", "range_layer", "stuck_layer", "inflation_layer"]
+      plugins: ["static_layer", "obstacle_layer", "stuck_layer", "inflation_layer"]
       static_layer:
         plugin: "nav2_costmap_2d::StaticLayer"
         # slam_toolbox publishes /map as transient local. Absolute topic so the costmap
@@ -226,9 +236,11 @@ global_costmap:
           obstacle_max_range: 5.0
           obstacle_min_range: 0.0
           inf_is_valid: true
-      # Low obstacles below the 13 cm lidar plane, from the 4 ToF sensors at ~5.5 cm
-      # (front/rear corners, 15 deg cone, 0.9 m) via range_relay.py. Own layer on purpose:
-      # in obstacle_layer the lidar's clearing rays would erase these marks every scan.
+      # UNUSED on Bisasam: not in the plugins list above, because its stack publishes no
+      # /range/* ToF topics. Kept for Raupy, where these are low obstacles below the 13 cm
+      # lidar plane, from the 4 ToF sensors at ~5.5 cm (front/rear corners, 15 deg cone,
+      # 0.9 m) via range_relay.py. Own layer on purpose: in obstacle_layer the lidar's
+      # clearing rays would erase these marks every scan.
       range_layer:
         plugin: "nav2_costmap_2d::RangeSensorLayer"
         enabled: true
@@ -302,7 +314,7 @@ smoother_server:
 
 behavior_server:
   ros__parameters:
-    enable_stamped_cmd_vel: true
+    enable_stamped_cmd_vel: false
     local_costmap_topic: local_costmap/costmap_raw
     global_costmap_topic: global_costmap/costmap_raw
     local_footprint_topic: local_costmap/published_footprint
@@ -364,7 +376,7 @@ route_server:
 
 velocity_smoother:
   ros__parameters:
-    enable_stamped_cmd_vel: true
+    enable_stamped_cmd_vel: false
     smoothing_frequency: 20.0
     stamp_smoothed_velocity_with_smoothing_time: false
     # When the angular limit clips a command, scale linear speed with it so the robot keeps
@@ -382,10 +394,10 @@ velocity_smoother:
     deadband_velocity: [0.0, 0.0, 0.0]
     velocity_timeout: 1.0
 
-# Last stage of the chain. It publishes the final /cmd_vel (TwistStamped) to the robot.
+# Last stage of the chain. It publishes the final /cmd_vel (plain Twist) to the robot.
 collision_monitor:
   ros__parameters:
-    enable_stamped_cmd_vel: true
+    enable_stamped_cmd_vel: false
     base_frame_id: "base_link"
     odom_frame_id: "odom"
     cmd_vel_in_topic: "cmd_vel_smoothed"
@@ -409,14 +421,17 @@ collision_monitor:
       min_points: 6
       visualize: false
       enabled: true
-    observation_sources: ["scan", "range_fl", "range_fr", "range_rl", "range_rr"]
+    # Lidar only: Bisasam publishes no ToF topics, and a "range" source whose topic never
+    # publishes is not harmless here -- the monitor would keep stopping the robot.
+    observation_sources: ["scan"]
     scan:
       type: "scan"
       topic: "/scan_clean"
       min_height: 0.15
       max_height: 2.0
       enabled: true
-    # Low ToF sensors (below the lidar plane), via range_relay.py.
+    # UNUSED on Bisasam (not in observation_sources above): low ToF sensors below the
+    # lidar plane, via range_relay.py. Kept for Raupy.
     range_fl:
       type: "range"
       topic: "/range_monitor/fl"
@@ -445,11 +460,11 @@ collision_monitor:
       enabled: true
 
 # Jazzy 1.3.x navigation_launch.py always starts docking_server. We don't dock, but it must
-# configure, and it publishes cmd_vel directly without remapping. Stamped keeps /cmd_vel
+# configure, and it publishes cmd_vel directly without remapping. Unstamped keeps /cmd_vel
 # to one message type.
 docking_server:
   ros__parameters:
-    enable_stamped_cmd_vel: true
+    enable_stamped_cmd_vel: false
     controller_frequency: 50.0
     initial_perception_timeout: 5.0
     wait_charge_timeout: 5.0

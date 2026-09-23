@@ -10,6 +10,10 @@
 # cases that look identical from the laptop:
 #   wheels turned  -> the motors are fine, the problem is in the stack (Nav2 / bridge / timing)
 #   wheels frozen  -> commands arrive but the MCU does not drive; power-cycle the robot.
+#
+# BISASAM BRANCH: /cmd_vel is a plain geometry_msgs/Twist here. Run this right after
+# scripts/raupy_check_interfaces.sh has confirmed that type -- with the wrong one the wheels
+# stay still and the test blames the MCU for what is really a type mismatch.
 
 lin="${1:-0.08}"
 ang="${2:-0.0}"
@@ -23,7 +27,7 @@ echo "raupy_drive_test: domain $ROS_DOMAIN_ID, linear ${lin} m/s, angular ${ang}
 python3 - "$lin" "$ang" "$secs" <<'EOF'
 import sys, time
 import rclpy
-from geometry_msgs.msg import TwistStamped
+from geometry_msgs.msg import Twist
 from sensor_msgs.msg import JointState
 
 lin, ang, secs = float(sys.argv[1]), float(sys.argv[2]), float(sys.argv[3])
@@ -39,7 +43,7 @@ def on_js(msg):
 
 
 node.create_subscription(JointState, '/joint_states', on_js, 10)
-pub = node.create_publisher(TwistStamped, '/cmd_vel', 10)
+pub = node.create_publisher(Twist, '/cmd_vel', 10)
 
 deadline = time.time() + 10.0
 while 'last' not in state and time.time() < deadline:
@@ -48,7 +52,6 @@ if 'last' not in state:
     print('  no /joint_states: the driver is not publishing, nothing to test')
     sys.exit(2)
 
-# The robot's driver drops commands whose stamp is older than 0.5 s, so stamp every message.
 before = dict(state['last'])
 print('  waiting for the robot to subscribe to /cmd_vel ...')
 deadline = time.time() + 10.0
@@ -60,11 +63,11 @@ if pub.get_subscription_count() == 0:
 
 
 def send(v, w):
-    msg = TwistStamped()
-    msg.header.stamp = node.get_clock().now().to_msg()
-    msg.header.frame_id = 'base_link'
-    msg.twist.linear.x = v
-    msg.twist.angular.z = w
+    # An unstamped Twist carries no timestamp, so unlike on Raupy the robot cannot reject
+    # this as "too old"; it stops on its own cmd_vel_timeout once we stop publishing.
+    msg = Twist()
+    msg.linear.x = v
+    msg.angular.z = w
     pub.publish(msg)
 
 

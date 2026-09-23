@@ -1,6 +1,7 @@
-# Frontier explorer parameters for Raupy (Husarion ROSbot 2 PRO, radius ~0.18 m, 360 deg RPLIDAR A3).
+# Frontier explorer parameters for Bisasam (Husarion ROSbot 2 PRO, radius ~0.18 m, 360 deg RPLIDAR).
 # Full copy of frontier_exploration_ros2 v1.6.1 config/params.yaml. The upstream comments are kept;
-# every value we changed or deliberately confirmed is marked with "# Raupy:".
+# every value we changed or deliberately confirmed is marked with "# Raupy:" (measured on the
+# identical Raupy chassis and carried over) or "# Bisasam:" (changed for this robot's stack).
 #
 # Interfaces used by exploration_supervisor (node runs without namespace):
 #   service /control_exploration  (frontier_exploration_ros2/srv/ControlExploration)
@@ -237,7 +238,8 @@ frontier_explorer:
 
     # LiDAR field of view in degrees used by the visible reveal gate above.
     # Raupy: 360 minus the ~55 deg rear sector cut by scan_filter.yaml (rear_shadow),
-    # centred on the robot's heading.
+    # centred on the robot's heading. Same on Bisasam: the sector is the Wi-Fi antennas,
+    # which sit on the back of every ROSbot 2 PRO.
     goal_preemption_lidar_fov_deg: 305.0
 
     # Angular spacing in degrees between LiDAR ray-cast samples for visible reveal estimation above.

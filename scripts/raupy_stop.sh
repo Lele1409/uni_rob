@@ -21,8 +21,10 @@ timeout 10 ros2 service call /navigate_to_pose/_action/cancel_goal action_msgs/s
 # 1 s of zeros overrides any last command from the controller/smoother.
 # pub first waits for the robot's /cmd_vel subscriber; discovery over Wi-Fi takes a few
 # seconds, so the timeout must be generous or it gets killed before sending anything.
-timeout 20 ros2 topic pub -w 1 -r 10 -t 10 /cmd_vel geometry_msgs/msg/TwistStamped \
-  "{header: {frame_id: base_link}}" >/dev/null \
+# Bisasam takes a plain Twist; publishing a TwistStamped here would create a second,
+# differently typed /cmd_vel that the robot ignores, and it would never stop.
+timeout 20 ros2 topic pub -w 1 -r 10 -t 10 /cmd_vel geometry_msgs/msg/Twist \
+  "{}" >/dev/null \
   || echo "raupy_stop: zero velocity not sent (no /cmd_vel subscriber found)" >&2
 
 echo "raupy_stop: done. Save the map with scripts/raupy_save_map.sh before closing the launch."

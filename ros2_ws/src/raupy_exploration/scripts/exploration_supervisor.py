@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Exploration supervisor for Raupy: decides when exploration ends, stops the robot, saves the map.
+"""Exploration supervisor: decides when exploration ends, stops the robot, saves the map.
 
 Stop conditions (see ``raupy_exploration.supervisor_logic.StopDecider``):
   * the frontier explorer reports completion (no frontiers left),
@@ -9,7 +9,7 @@ Stop conditions (see ``raupy_exploration.supervisor_logic.StopDecider``):
 Stop sequence, run exactly once:
   1. STOP the frontier explorer via its control service,
   2. cancel all Nav2 ``navigate_to_pose`` goals,
-  3. publish zero TwistStamped on /cmd_vel for about one second,
+  3. publish zero velocities on /cmd_vel for about one second,
   4. save the map with nav2 ``map_saver`` and serialize the slam_toolbox pose graph,
   5. write ``<base>_summary.yaml``,
   6. optionally shut the node down.
@@ -25,7 +25,6 @@ import threading
 import time
 
 from action_msgs.srv import CancelGoal
-from geometry_msgs.msg import TwistStamped
 from nav2_msgs.srv import SaveMap
 from nav_msgs.msg import OccupancyGrid
 import rclpy
@@ -37,6 +36,7 @@ from slam_toolbox.srv import SerializePoseGraph
 from std_msgs.msg import Empty
 import yaml
 
+from raupy_exploration.cmd_vel_util import cmd_vel_type, make_cmd_vel
 from raupy_exploration.supervisor_logic import (
     build_summary,
     known_area_m2,
@@ -88,6 +88,9 @@ class ExplorationSupervisor(Node):
         self.serialize_service = self.declare_parameter(
             'serialize_service', '/slam_toolbox/serialize_map').value
         cmd_vel_topic = self.declare_parameter('cmd_vel_topic', '/cmd_vel').value
+        # Bisasam's Humble stack takes a plain Twist; Raupy's Jazzy stack a TwistStamped.
+        self.cmd_vel_stamped = self.declare_parameter('cmd_vel_stamped', False).value
+        self.base_frame = self.declare_parameter('base_frame', 'base_link').value
         self.map_name = self.declare_parameter('map_name', 'raupy_map').value
         self.map_output_dir = self.declare_parameter('map_output_dir', '').value
         self.shutdown_on_finish = self.declare_parameter('shutdown_on_finish', True).value
@@ -124,7 +127,8 @@ class ExplorationSupervisor(Node):
             callback_group=monitor_group)
         self.create_timer(check_period_s, self._on_check, callback_group=monitor_group)
 
-        self.cmd_vel_pub = self.create_publisher(TwistStamped, cmd_vel_topic, 10)
+        self.cmd_vel_pub = self.create_publisher(
+            cmd_vel_type(self.cmd_vel_stamped), cmd_vel_topic, 10)
         # Latched "the run is over": stuck_monitor's rescue must not restart the explorer after this.
         self.stopped_pub = self.create_publisher(Empty, '/exploration_stopped', LATCHED_QOS)
 
@@ -277,11 +281,12 @@ class ExplorationSupervisor(Node):
         # own 0.5 s cmd_vel timeout, this just makes the stop immediate.
         count = int(ZERO_TWIST_RATE_HZ * ZERO_TWIST_DURATION_S)
         for _ in range(count):
-            msg = TwistStamped()
-            msg.header.stamp = self.get_clock().now().to_msg()
-            # Raupy's diff drive controller expects base_link (it has no base_footprint).
-            msg.header.frame_id = 'base_link'
-            self.cmd_vel_pub.publish(msg)
+            # The stamp matters only for TwistStamped: the diff drive controller drops
+            # commands older than its cmd_vel_timeout (0.5 s), so it must be current.
+            self.cmd_vel_pub.publish(make_cmd_vel(
+                self.cmd_vel_stamped,
+                stamp=self.get_clock().now().to_msg(),
+                frame_id=self.base_frame))
             # Wall-clock sleep on purpose: the stop must not depend on a running /clock.
             time.sleep(1.0 / ZERO_TWIST_RATE_HZ)
         self.get_logger().info(f'Published {count} zero velocity commands.')

@@ -24,14 +24,18 @@ exploration_supervisor:
     navigate_action: /navigate_to_pose
     map_saver_service: /map_saver/save_map
     serialize_service: /slam_toolbox/serialize_map
-    # Raupy expects geometry_msgs/TwistStamped here.
     cmd_vel_topic: /cmd_vel
+    # Bisasam expects a plain geometry_msgs/Twist here (Raupy: TwistStamped). Must agree
+    # with enable_stamped_cmd_vel in nav2_raupy.yaml and the type in domain_bridge.yaml.
+    cmd_vel_stamped: false
+    # Only used to stamp the zero velocities when cmd_vel_stamped is true.
+    base_frame: base_link
     # Upper bound for each service wait/call in the stop sequence.
     service_timeout_s: 10.0
 
     # --- Output ---
     # Files: <map_output_dir>/<map_name>_<YYYYmmdd_HHMMSS>.{yaml,pgm,posegraph,data} + _summary.yaml
-    map_name: raupy_map
+    map_name: bisasam_map
     # Empty means ~/raupy_maps.
     map_output_dir: ""
     # Exit after the stop sequence (false: stay idle).

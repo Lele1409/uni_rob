@@ -1,12 +1,59 @@
-# Thema 1 – Automatische Kartierung on Raupy
+# Thema 1 – Automatische Kartierung on Bisasam
 
 **Deadline:** presentation by **2026-09-25** (15 min). Also required: commented code, and a
 README in git that says who did what ("Wer hat was gemacht").
 
 **Approach:** use the library `mertgulerx/frontier_exploration_ros2` as is. We don't implement
 the lecture's own scoring formula. Our own work is:
-- integrating the library on Raupy (SLAM, Nav2, explorer config, launch files)
+- integrating the library on the robot (SLAM, Nav2, explorer config, launch files)
 - a supervisor node that stops the run and saves the map
+
+## 0. This branch: Bisasam instead of Raupy (2026-09-23)
+
+Raupy went out of order on 2026-09-22 (intermittent motor/encoder failure, see the Status
+notes). Bisasam is the **same Husarion ROSbot 2 PRO hardware** but runs its **own ROS stack**,
+so everything physical carries over unchanged and everything about interfaces had to be
+adapted. Branch `bisasam`; `wf-materials` stays as the Raupy version.
+
+| | Raupy (`wf-materials`) | Bisasam (this branch) |
+|---|---|---|
+| ROS on the robot | Jazzy, native `rosbot_ros` | **Humble, in Docker** |
+| DDS | `rmw_fastrtps_cpp` | **`rmw_cyclonedds_cpp`** (laptop must match) |
+| `ROS_DOMAIN_ID` | 103 = 100 + last 2 digits of the IP, recomputed per service start | **30**, fixed in the container env, **shared with another group** |
+| `/cmd_vel` | `geometry_msgs/TwistStamped` | **`geometry_msgs/Twist`** (unstamped) |
+| Low ToF sensors `/range/*` | 4 of them, feed `range_layer` + collision monitor | **not published** |
+| Lidar start | `rosbot-lidar.sh start` over SSH (off by default) | comes up with the container stack |
+| Process control | `microros` / `rosbot` systemd units | containers (`docker ps`, `docker logs`) |
+| Lidar mounting yaw | URDF wrong (−90°), fixed with `laser_yaw_fix:=3.14159` | **unknown until measured** — `raupy_check_interfaces.sh` derives it |
+
+Unchanged, because the chassis is identical: footprint (`robot_radius 0.17`), the chassis box
+filter, the rear antenna shadow, all Nav2/explorer tuning from the Raupy runs, and the
+CORE2/STM32 failure modes (so `raupy_drive_test.sh` and `raupy_mcu_diag.sh` still apply).
+
+**The `/cmd_vel` type is the one that bites silently.** A TwistStamped on a Twist topic is a
+different topic type: nothing errors, the robot just never receives a command. Four places
+must agree — `enable_stamped_cmd_vel` in `nav2_raupy.yaml` (5×), `cmd_vel_stamped` in
+`supervisor.yaml` and `stuck_monitor.yaml`, and the type in `domain_bridge.yaml`. The node
+side goes through `raupy_exploration/cmd_vel_util.py` so one parameter switches both nodes.
+
+Names keep the `raupy_` prefix (package, scripts, config files) on purpose, so the diff
+against `wf-materials` stays readable and fixes can be cherry-picked between branches.
+
+### Order of operations on the first Bisasam session
+
+```bash
+scripts/raupy_check_interfaces.sh   # once: verifies every assumption above, names what to change
+scripts/raupy_preflight.sh          # before every session
+scripts/raupy_drive_test.sh         # after every power-cycle: do the wheels actually turn?
+scripts/raupy_explore.sh            # the run
+```
+
+`raupy_check_interfaces.sh` is the important one: the adaptation was made from inspection
+notes, not from a live robot, so it re-checks the `/cmd_vel` type, the odom topic, the base
+frame, the absence of the ToF topics, and the lidar yaw, and prints the file and value to
+change for each mismatch. It measures the yaw by where the Wi-Fi antennas block the scan:
+those sit at 180° on the chassis, so the beam direction they shadow tells you where the lidar
+really points, regardless of what the URDF claims.
 
 ## Status (2026-09-16)
 
@@ -30,11 +77,14 @@ ros2 run raupy_exploration fake_raupy.py &
 ros2 launch raupy_exploration exploration.launch.py use_scan_filter:=false max_duration_s:=360.0 map_output_dir:=$PWD/maps_offline
 ```
 
-Real robot (Phase 5):
+Offline note for this branch: `fake_raupy.py` now takes an unstamped `Twist` by default, so
+it matches Bisasam. Start it with `--ros-args -p cmd_vel_stamped:=true` to rehearse Raupy.
+
+Real robot (Phase 5), see section 0 for the full order:
 ```bash
-ssh husarion@raupy.roblab.cs.hs-fulda.de rosbot-lidar.sh start
-source scripts/raupy_env.sh
-ros2 launch raupy_exploration exploration.launch.py
+scripts/raupy_check_interfaces.sh   # once per robot
+scripts/raupy_preflight.sh
+scripts/raupy_explore.sh
 ```
 
 ## 1. Task (`folien/Robotik_SoSe2025_Projekt_compressed-2.pdf`, slide 509)
@@ -58,6 +108,10 @@ In the presentation, relate the library to the lecture's SPLAM slides (510–512
 No code for this.
 
 ## 2. Robot facts – Raupy (inspected 2026-09-16)
+
+*Kept as the reference measurement. Everything physical also holds for Bisasam;
+for the interface rows see the table in section 0 and verify with
+`scripts/raupy_check_interfaces.sh`.*
 
 Raw dumps are in `wf/raupy_info.txt`, `wf/raupy_info2.txt` and `wf/raupy_live.txt`
 (gitignored, since they contain shell history). They were generated with `wf/raupy_inspect.sh`.
@@ -117,6 +171,7 @@ Raw dumps are in `wf/raupy_info.txt`, `wf/raupy_info2.txt` and `wf/raupy_live.tx
 | `ros-jazzy-laser-filters` | Remove chassis returns from `/scan` | **install** |
 | `ros-jazzy-navigation2`, `ros-jazzy-nav2-bringup` | Navigation incl. RPP controller, map_saver | installed |
 | `ros-jazzy-slam-toolbox` | SLAM | installed |
+| `ros-jazzy-rmw-cyclonedds-cpp` | DDS matching Bisasam's containers | **install** |
 | `ros-jazzy-teleop-twist-keyboard` | Manual driving / safety | installed |
 | `ros-jazzy-rviz2`, `ros-jazzy-nav2-rviz-plugins`, `ros-jazzy-tf2-tools` | Visualisation / debugging | installed |
 | `ros-jazzy-rosbag2` | Recording demo runs | installed |
@@ -334,3 +389,6 @@ One well-commented node in `raupy_exploration`.
 | Low battery during demo | Charge before sessions; lidar only on while testing |
 | Laptop/robot clocks out of sync → collision_monitor stops the robot ("invalid source", scan older than 2 s), TF extrapolation errors | Sync both clocks via NTP/chrony before a session (`timedatectl` on both); check `ros2 topic delay /scan` |
 | Limited robot time | Prepare configs and launch files before robot slots; test launch files with a recorded rosbag (`--clock`, `use_sim_time`) |
+| Laptop Jazzy vs robot Humble: cross-distro DDS is not officially supported | Only `domain_bridge` crosses the line, and only with message types that are identical in both distros. `raupy_check_interfaces.sh` confirms the types before a run |
+| Domain 30 is shared with another group: their nodes appear in our discovery, and ours in theirs | The stack runs on its own laptop-only domain behind the bridge, so exactly one participant of ours is on 30. Ask them before restarting anything on the robot |
+| Wrong `/cmd_vel` type fails silently (robot never moves, no error) | `raupy_check_interfaces.sh` checks it first, `raupy_drive_test.sh` confirms the wheels turn before a real run |
