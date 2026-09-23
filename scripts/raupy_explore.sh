@@ -29,6 +29,30 @@ if ! ros2 pkg prefix domain_bridge >/dev/null 2>&1; then
   exit 1
 fi
 
+# The lidar is off by default (rplidar.service). Without /scan, SLAM never publishes a map
+# and the whole run hangs silently waiting for it (seen 2026-09-22), so start it here when
+# the preflight was skipped.
+if ! timeout 20 python3 - <<'EOF'
+import sys, rclpy
+from rclpy.qos import qos_profile_sensor_data
+from sensor_msgs.msg import LaserScan
+rclpy.init()
+n = rclpy.create_node('explore_scan_check')
+got = []
+n.create_subscription(LaserScan, '/scan', lambda m: got.append(1), qos_profile_sensor_data)
+for _ in range(60):
+    if got:
+        break
+    rclpy.spin_once(n, timeout_sec=0.2)
+sys.exit(0 if got else 1)
+EOF
+then
+  echo "raupy_explore: no /scan, starting the lidar on the robot ..." >&2
+  ssh -o BatchMode=yes -o ConnectTimeout=5 "$RAUPY_USER@$RAUPY_HOST" 'rosbot-lidar.sh start' >&2 \
+    || { echo "raupy_explore: could not start the lidar, run scripts/raupy_preflight.sh" >&2; exit 1; }
+  sleep 5
+fi
+
 # The box filter needs laser_filters on the laptop; without it the launch would abort.
 if ros2 pkg prefix laser_filters >/dev/null 2>&1; then
   filter=true

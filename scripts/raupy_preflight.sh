@@ -96,6 +96,34 @@ else
   fail "TF odom -> base_link not received"
 fi
 
+# The MCU can come up half dead: ros2_control activates, topics flow, but the firmware
+# repeats one frozen sample forever (seen 2026-09-22: identical IMU quaternion/acceleration,
+# encoders stuck, motors silent). The EKF then diverges on those constant inputs and invents
+# motion, so the map drifts away mid-run. A live IMU always jitters, so identical samples
+# are a reliable giveaway.
+imu=$(timeout 20 python3 - <<'EOF' 2>/dev/null
+import rclpy
+from sensor_msgs.msg import Imu
+rclpy.init(); n = rclpy.create_node('preflight_imu_alive'); s = []
+n.create_subscription(Imu, '/imu/data', lambda m: s.append(
+    (m.orientation.z, m.angular_velocity.z, m.linear_acceleration.x)), 10)
+for _ in range(100):
+    if len(s) >= 50:
+        break
+    rclpy.spin_once(n, timeout_sec=0.2)
+print(f'{len(s)} {len(set(s))}')
+EOF
+)
+read -r n_imu n_uniq <<< "${imu:-0 0}"
+if [ "${n_imu:-0}" -lt 10 ]; then
+  fail "IMU: no /imu/data (the driver is not publishing)"
+elif [ "${n_uniq:-0}" -le 1 ]; then
+  fail "IMU frozen: $n_imu identical samples. The MCU is half dead (encoders and motors too)."
+  fail "  Power-cycle the robot, then check with scripts/raupy_drive_test.sh."
+else
+  ok "IMU alive ($n_uniq distinct samples out of $n_imu)"
+fi
+
 echo
 if [ "$FAILED" = 0 ]; then
   echo "Preflight passed. Next: scripts/raupy_explore.sh"
